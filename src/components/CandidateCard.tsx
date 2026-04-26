@@ -36,7 +36,7 @@ const PARTY_COLORS: Record<string, { bg: string; text: string; border: string; b
   "SWADHIN": { bg: "bg-slate-100", text: "text-slate-600", border: "border-slate-200", badge: "bg-slate-600 text-white", icon: User },
 };
 
-import { Landmark, Globe, Users, Leaf, Sun, Moon } from "lucide-react";
+import { Landmark, Globe, Users, Leaf, Sun, Moon, User } from "lucide-react";
 
 const getPartyStyle = (partyName: string) => {
   const upper = partyName?.toUpperCase() || "";
