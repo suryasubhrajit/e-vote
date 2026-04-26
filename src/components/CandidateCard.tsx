@@ -23,7 +23,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
-import { AlertTriangle, CheckCircle2, Vote, User } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Vote, User, Landmark, Globe, Users, Leaf, Sun, Moon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 // Map of known party colors for Indian political parties
@@ -36,7 +36,6 @@ const PARTY_COLORS: Record<string, { bg: string; text: string; border: string; b
   "SWADHIN": { bg: "bg-slate-100", text: "text-slate-600", border: "border-slate-200", badge: "bg-slate-600 text-white", icon: User },
 };
 
-import { Landmark, Globe, Users, Leaf, Sun, Moon, User } from "lucide-react";
 
 const getPartyStyle = (partyName: string) => {
   const upper = partyName?.toUpperCase() || "";
