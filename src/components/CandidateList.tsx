@@ -35,8 +35,8 @@ const CandidatesList: React.FC<CandidateListProps> = ({
         <CandidateCard
           key={candidate.id}
           {...candidate}
-          photoUrl={candidate.photoURL} // Mapping photoURL to photoUrl prop
-          partySymbolUrl={candidate.partySymbolURL} // Mapping partySymbolURL to partySymbolUrl prop
+          photoURL={candidate.photoURL}
+          partySymbolURL={candidate.partySymbolURL}
           votingOption={votingOption}
         />
       ))}

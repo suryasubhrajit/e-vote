@@ -55,7 +55,7 @@ interface CandidateCardProps {
   mission?: string;
   type?: 'MP' | 'MLA';
   partyName?: string;
-  partySymbolUrl?: string;
+  partySymbolURL?: string;
   state?: string;
   constituency?: string;
   biography?: string;
@@ -64,8 +64,6 @@ interface CandidateCardProps {
   liabilities?: string;
   criminal_records?: string;
   voted?: boolean;
-  constituency?: string;
-  state?: string;
 }
 
 const CandidateCard: React.FC<CandidateCardProps> = ({
@@ -78,7 +76,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   mission = "",
   type,
   partyName = "",
-  partySymbolUrl,
+  partySymbolURL,
   biography,
   education,
   assets,
