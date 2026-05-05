@@ -64,6 +64,7 @@ interface CandidateCardProps {
   liabilities?: string;
   criminal_records?: string;
   voted?: boolean;
+  onVoteSuccess?: () => void;
 }
 
 const CandidateCard: React.FC<CandidateCardProps> = ({
@@ -85,29 +86,14 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   voted = false,
   constituency = "",
   state = "",
+  onVoteSuccess,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showVVPAT, setShowVVPAT] = useState(false);
   const router = useRouter();
   const partyStyle = getPartyStyle(partyName || description);
 
-  // Generate a deterministic seed from the candidate's name so the same
-  // candidate always gets the same realistic human photo from randomuser.me
-  const getAvatarSeed = (candidateName: string) => {
-    let hash = 0;
-    for (let i = 0; i < candidateName.length; i++) {
-      hash = (hash << 5) - hash + candidateName.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash) % 100; // randomuser.me has ~100 unique photos per gender
-  };
-
-  const seed = getAvatarSeed(name || 'candidate');
-  const gender = seed % 2 === 0 ? 'men' : 'women';
-  const photoIndex = (seed % 70) + 1; // indices 1–70 are reliably available
-
-  const validphotoUrl =
-    photoURL && photoURL.trim() !== "" ? photoURL : `https://randomuser.me/api/portraits/${gender}/${photoIndex}.jpg`;
+  const validphotoUrl = photoURL && photoURL.trim() !== "" ? photoURL : null;
 
   const handleVote = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -142,8 +128,12 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
 
       setTimeout(() => {
         setShowVVPAT(false);
-        router.push("/vote");
-        router.refresh(); // Ensure status updates
+        if (onVoteSuccess) {
+          onVoteSuccess();
+        } else {
+          router.push("/vote");
+          router.refresh(); // Ensure status updates
+        }
       }, 3000);
     } catch (error) {
       toast.error("Failed to cast vote. Please try again.");

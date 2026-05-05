@@ -453,7 +453,7 @@ export default function VotePage() {
           ) : mpCandidates.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {mpCandidates.map(candidate => (
-                <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMP} voted={votedMP} />
+                <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMP} voted={votedMP} onVoteSuccess={loadData} />
               ))}
             </div>
           ) : (
@@ -485,7 +485,7 @@ export default function VotePage() {
           ) : mlaCandidates.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {mlaCandidates.map(candidate => (
-                <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMLA} voted={votedMLA} />
+                <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMLA} voted={votedMLA} onVoteSuccess={loadData} />
               ))}
             </div>
           ) : (

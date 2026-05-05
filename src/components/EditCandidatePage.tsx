@@ -59,6 +59,17 @@ export default function EditCandidatePage() {
             vision: data.vision || "",
             mission: data.mission || "",
             photoURL: data.photo_url || "",
+            type: data.type,
+            partyName: data.party_name || "",
+            partySymbolURL: data.party_symbol_url || "",
+            state: data.state || "",
+            constituency: data.constituency || "",
+            biography: data.biography || "",
+            education: data.education || "",
+            assets: data.assets || "",
+            liabilities: data.liabilities || "",
+            criminal_records: data.criminal_records || "",
+            district: data.district || "",
           });
 
           setName(data.name || "");

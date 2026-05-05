@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,9 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BsList } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
 import { ModeToggle } from "./ThemeToggle";
+import { Badge } from "./ui/badge";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
 import { Button } from "./ui/button";
 import { Landmark, ShieldCheck, Fingerprint } from "lucide-react";
@@ -24,7 +34,24 @@ import Meteors from "@/components/magicui/meteors";
 export default function Navbar() {
   const { user, isAdmin, isVoterVerified } = useAuthMiddleware();
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [voterDetails, setVoterDetails] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchVoterDetails = async () => {
+      if (user && isVoterVerified) {
+        const { data, error } = await supabase
+          .from('voters')
+          .select('*')
+          .eq('linked_profile_id', user.id)
+          .single();
+        
+        if (data) setVoterDetails(data);
+      }
+    };
+    fetchVoterDetails();
+  }, [user, isVoterVerified]);
 
   const handleLogout = async () => {
     try {
@@ -72,31 +99,31 @@ export default function Navbar() {
           <nav className="hidden md:block">
             <ul className="flex items-center gap-8">
               <li>
-                <Link href={"/"} className="text-sm font-semibold hover:text-[#FF9933] transition-colors uppercase tracking-widest">
+                <Link href={"/"} className={`text-sm font-semibold hover:text-[#FF9933] transition-all uppercase tracking-widest relative py-1 ${pathname === "/" ? "text-[#FF9933] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#FF9933]" : "text-white"}`}>
                   Home
                 </Link>
               </li>
               <li>
-                <Link href={"/about"} className="text-sm font-semibold hover:text-[#FF9933] transition-colors uppercase tracking-widest">
+                <Link href={"/about"} className={`text-sm font-semibold hover:text-[#FF9933] transition-all uppercase tracking-widest relative py-1 ${pathname === "/about" ? "text-[#FF9933] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#FF9933]" : "text-white"}`}>
                   About
                 </Link>
               </li>
               <li>
-                <Link href={"/candidates"} className="text-sm font-semibold hover:text-[#FF9933] transition-colors uppercase tracking-widest">
+                <Link href={"/candidates"} className={`text-sm font-semibold hover:text-[#FF9933] transition-all uppercase tracking-widest relative py-1 ${pathname === "/candidates" ? "text-[#FF9933] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#FF9933]" : "text-white"}`}>
                   Candidates
                 </Link>
               </li>
               <li>
-                <Link href={"/vote"} className="text-sm font-semibold hover:text-[#FF9933] transition-colors uppercase tracking-widest">
+                <Link href={"/vote"} className={`text-sm font-semibold hover:text-[#FF9933] transition-all uppercase tracking-widest relative py-1 ${pathname === "/vote" ? "text-[#FF9933] after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#FF9933]" : "text-white"}`}>
                   Vote
                 </Link>
               </li>
               <li className="h-6 w-px bg-slate-700 mx-2" />
               <li>
                 {user ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="outline-none">
-                      <div className="flex items-center gap-3 hover:bg-white/10 px-3 py-1 rounded-full transition-all">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <div className="flex items-center gap-3 hover:bg-white/10 px-3 py-1 rounded-full transition-all cursor-pointer">
                         <Avatar className="w-8 h-8 border border-[#FF9933]/40">
                           <AvatarImage
                             src={user.user_metadata?.avatar_url}
@@ -108,26 +135,107 @@ export default function Navbar() {
                         </Avatar>
                         <span className="text-sm font-medium hidden lg:inline">{user.user_metadata?.full_name || user.email}</span>
                       </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 mt-2">
-                      <DropdownMenuLabel>Voter Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {isAdmin && (
-                        <DropdownMenuItem>
-                          <Link href={"/dashboard"} className="w-full">Election Dashboard</Link>
-                        </DropdownMenuItem>
-                      )}
-                      {!isVoterVerified ? (
-                        <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                          Sign Out
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem disabled className="text-slate-400">
-                          Sign Out (Locked)
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-[#0f172a] text-white border-slate-800 shadow-2xl p-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                      <div className="sticky top-0 z-10">
+                        <div className="w-full h-1 flex">
+                          <div className="flex-1 bg-[#FF9933]" />
+                          <div className="flex-1 bg-white" />
+                          <div className="flex-1 bg-[#138808]" />
+                        </div>
+                        <DialogHeader className="bg-[#0f172a]/95 backdrop-blur-md p-6 pb-4 border-b border-white/5">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                              <ShieldCheck className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <DialogTitle className="text-xl font-black tracking-tight uppercase">Voter Digital Passport</DialogTitle>
+                              <DialogDescription className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                                Government of Bharat • Official Identity Terminal
+                              </DialogDescription>
+                            </div>
+                          </div>
+                        </DialogHeader>
+                      </div>
+                      
+                      <div className="p-6 md:p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+                          {/* Profile Section (Left) */}
+                          <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 bg-slate-900/40 p-8 rounded-3xl border border-white/5 relative overflow-hidden group">
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#FF9933]/5 to-[#138808]/5 opacity-50" />
+                            <Avatar className="w-32 h-32 border-4 border-slate-800 shadow-2xl relative z-10">
+                              <AvatarImage src={user.user_metadata?.avatar_url} />
+                              <AvatarFallback className="text-4xl bg-gradient-to-br from-slate-700 to-slate-900 text-white font-black">
+                                {user.user_metadata?.full_name?.[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="text-center relative z-10">
+                              <h3 className="text-2xl font-black text-white leading-tight">{user.user_metadata?.full_name}</h3>
+                              <Badge className={`mt-3 px-4 py-1 text-[10px] font-black tracking-[0.2em] border-none shadow-lg ${isVoterVerified ? "bg-green-500 text-white" : "bg-amber-500 text-white"}`}>
+                                {isVoterVerified ? "AUTHORIZED" : "PENDING"}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {/* Details Section (Right) */}
+                          <div className="md:col-span-3 space-y-4">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                              <div className="h-px flex-1 bg-slate-800" />
+                              Citizen Data
+                              <div className="h-px w-4 bg-slate-800" />
+                            </p>
+                            <div className="grid grid-cols-1 gap-3">
+                              {[
+                                { label: "EPIC Number", value: voterDetails?.voter_id_epic, isHighlight: true, icon: Fingerprint },
+                                { label: "State / UT", value: voterDetails?.state, icon: Landmark },
+                                { label: "MP constituency", value: voterDetails?.constituency_mp, icon: ShieldCheck },
+                                { label: "MLA constituency", value: voterDetails?.constituency_mla, icon: ShieldCheck },
+                              ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-900/60 border border-white/5 group hover:bg-slate-800/60 transition-all">
+                                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                    <item.icon className={`w-5 h-5 ${item.isHighlight ? "text-[#FF9933]" : "text-slate-400"}`} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-none mb-1.5">{item.label}</p>
+                                    <p className={`text-base font-bold truncate ${item.isHighlight ? "text-[#FF9933] font-mono tracking-wider" : "text-white"}`}>
+                                      {item.value || "NOT AVAILABLE"}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <DialogFooter className="p-8 pt-0 flex flex-col gap-6">
+                        <div className="flex flex-col md:flex-row gap-3 w-full">
+                          <Button asChild variant="outline" className="flex-1 h-12 border-slate-800 bg-slate-900/50 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-widest transition-all">
+                            <Link href="/vote">EVM Status</Link>
+                          </Button>
+                          <Button asChild variant="outline" className="flex-1 h-12 border-slate-800 bg-slate-900/50 hover:bg-slate-800 text-slate-300 font-bold text-xs uppercase tracking-widest transition-all">
+                            <Link href="/about">Help Center</Link>
+                          </Button>
+                          {isAdmin && (
+                            <Button asChild className="flex-1 h-12 bg-white text-slate-900 hover:bg-slate-200 font-black text-xs uppercase tracking-[0.2em] shadow-xl">
+                              <Link href="/dashboard">Admin Panel</Link>
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col items-center gap-2 pt-6 border-t border-white/5">
+                          <div className="flex items-center gap-3 opacity-20">
+                            <div className="h-px w-16 bg-white" />
+                            <Fingerprint className="w-6 h-6" />
+                            <div className="h-px w-16 bg-white" />
+                          </div>
+                          <p className="text-[10px] text-slate-600 font-black uppercase tracking-[0.3em]">
+                            Authenticated Secure Terminal
+                          </p>
+                        </div>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 ) : (
                   <Link href={"/auth/login"}>
                     <Button variant="outline" className="bg-transparent border-[#FF9933] text-[#FF9933] hover:bg-[#FF9933] hover:text-white font-bold px-6">
@@ -157,10 +265,10 @@ export default function Navbar() {
             </button>
           </div>
           <ul className="flex flex-col items-center gap-12 text-white mt-12">
-            <li><Link href="/" onClick={toggleSidebar} className="text-2xl font-bold hover:text-[#FF9933] transition-colors">Home</Link></li>
-            <li><Link href="/about" onClick={toggleSidebar} className="text-2xl font-bold hover:text-[#FF9933] transition-colors">About</Link></li>
-            <li><Link href="/candidates" onClick={toggleSidebar} className="text-2xl font-bold hover:text-[#FF9933] transition-colors">Candidates</Link></li>
-            <li><Link href="/vote" onClick={toggleSidebar} className="text-2xl font-bold hover:text-[#FF9933] transition-colors">Vote</Link></li>
+            <li><Link href="/" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Home</Link></li>
+            <li><Link href="/about" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/about" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>About</Link></li>
+            <li><Link href="/candidates" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/candidates" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Candidates</Link></li>
+            <li><Link href="/vote" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/vote" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Vote</Link></li>
             <li>
               {user ? (
                 !isVoterVerified ? (

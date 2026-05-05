@@ -34,7 +34,7 @@ export const fetchCandidates = async () => {
     description: candidate.description || "No Description Provided",
     vision: candidate.vision || "No Vision Provided",
     mission: candidate.mission || "No Mission Provided",
-    photoURL: candidate.photo_url || `https://randomuser.me/api/portraits/men/${Math.abs([...(candidate.name || 'candidate')].reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 100}.jpg`,
+    photoURL: candidate.photo_url,
     type: candidate.type,
     partyName: candidate.party_name || "Swadhin",
     partySymbolURL: candidate.party_symbol_url,
@@ -73,47 +73,86 @@ export const fetchUsers = async () => {
 
 
 export async function getElectionStats(): Promise<{
-  totalVoters: number;
+  totalVotes: number;
   totalCandidates: number;
   voterTurnout: number;
 }> {
   try {
-    const [votersRes, candidatesRes, usersRes] = await Promise.all([
-      // Fetching total voters who have cast at least one vote
-      supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .or('voted_mp.eq.true,voted_mla.eq.true'),
-      
-      // Fetching total candidates
-      supabase
-        .from('candidates')
-        .select('*', { count: 'exact', head: true }),
-      
-      // Calculating voter turnout
-      supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
+    // Get unique voters who have cast at least one vote
+    const { data: uniqueVoters, error: votersError } = await supabase
+      .from('votes')
+      .select('voter_profile_id');
+    
+    const uniqueVoterIds = new Set(uniqueVoters?.map(v => v.voter_profile_id)).size;
+
+    const [votesCount, candidatesRes, profilesRes] = await Promise.all([
+      supabase.from('votes').select('*', { count: 'exact', head: true }),
+      supabase.from('candidates').select('*', { count: 'exact', head: true }),
+      supabase.from('profiles').select('*', { count: 'exact', head: true })
     ]);
 
-    if (votersRes.error) throw votersRes.error;
-    if (candidatesRes.error) throw candidatesRes.error;
-    if (usersRes.error) throw usersRes.error;
-
-    const totalVoters = votersRes.count ?? 0;
+    const totalVotes = votesCount.count ?? 0;
     const totalCandidates = candidatesRes.count ?? 0;
-    const totalUsers = usersRes.count ?? 0;
-
-    const voterTurnout = totalUsers > 0 ? (totalVoters / totalUsers) * 100 : 0;
+    const totalProfiles = profilesRes.count ?? 0;
+    
+    const voterTurnout = totalProfiles > 0 ? (uniqueVoterIds / totalProfiles) * 100 : 0;
 
     return {
-      totalVoters,
+      totalVotes,
       totalCandidates,
       voterTurnout,
     };
   } catch (error) {
     console.error("Error fetching election stats:", error);
-    throw new Error("Failed to fetch election statistics");
+    return { totalVotes: 0, totalCandidates: 0, voterTurnout: 0 };
+  }
+}
+
+export async function getLiveResults() {
+  try {
+    // Fetch all votes and join with candidates
+    const { data: votes, error: votesError } = await supabase
+      .from('votes')
+      .select(`
+        candidate_id,
+        candidates (
+          name,
+          party_name,
+          party_symbol_url,
+          type,
+          photo_url,
+          state,
+          constituency
+        )
+      `);
+
+    if (votesError) throw votesError;
+
+    // Tally votes
+    const tally: Record<string, any> = {};
+    votes.forEach((v: any) => {
+      const id = v.candidate_id;
+      if (!tally[id]) {
+        tally[id] = {
+          id,
+          name: v.candidates?.name,
+          party: v.candidates?.party_name,
+          symbol: v.candidates?.party_symbol_url,
+          type: v.candidates?.type,
+          photo: v.candidates?.photo_url,
+          state: v.candidates?.state,
+          constituency: v.candidates?.constituency,
+          votes: 0
+        };
+      }
+      tally[id].votes++;
+    });
+
+    // Convert to array and sort
+    return Object.values(tally).sort((a, b) => b.votes - a.votes);
+  } catch (error) {
+    console.error("Error fetching live results:", error);
+    return [];
   }
 }
 

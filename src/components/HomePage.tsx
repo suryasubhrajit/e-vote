@@ -5,8 +5,10 @@ import { Button } from "./ui/button";
 import { ArrowRight, ShieldCheck, Globe, Lock, CheckCircle2, Timer, Fingerprint, Vote, Landmark, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
-import { getElectionStats } from "@/lib/utils";
+import { getElectionStats, getLiveResults } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
+import { Search, Filter, Trophy, TrendingUp, User as UserIcon } from "lucide-react";
 import Meteors from "@/components/magicui/meteors";
 import RetroGrid from "@/components/magicui/retro-grid";
 
@@ -14,7 +16,8 @@ const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
-    const target = new Date("2029-05-15T00:00:00");
+    const target = new Date();
+    target.setDate(target.getDate() + 14); // Set to 14 days from today for simulation
     const interval = setInterval(() => {
       const now = new Date();
       const difference = target.getTime() - now.getTime();
@@ -71,22 +74,42 @@ const AshokaChakra = ({ className = "w-12 h-12" }: { className?: string }) => (
 export default function HomePage() {
   const { user } = useAuthMiddleware();
   const [stats, setStats] = useState<{
-    totalVoters: number;
+    totalVotes: number;
     totalCandidates: number;
     voterTurnout: number;
   } | null>(null);
+  const [liveResults, setLiveResults] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"ALL" | "MP" | "MLA">("ALL");
+  const [stateFilter, setStateFilter] = useState("ALL");
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchAllData = async () => {
       try {
-        const data = await getElectionStats();
-        setStats(data);
+        const [statsData, resultsData] = await Promise.all([
+          getElectionStats(),
+          getLiveResults()
+        ]);
+        setStats(statsData);
+        setLiveResults(resultsData.slice(0, 5)); // Show top 5
       } catch (error) {
-        console.error("Failed to fetch election stats", error);
+        console.error("Failed to fetch data", error);
       }
     };
-    fetchStats();
+    fetchAllData();
+    const interval = setInterval(fetchAllData, 10000); // Auto refresh every 10s
+    return () => clearInterval(interval);
   }, []);
+
+  const filteredResults = liveResults.filter(candidate => {
+    const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         candidate.party.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === "ALL" || candidate.type === typeFilter;
+    const matchesState = stateFilter === "ALL" || candidate.state === stateFilter;
+    return matchesSearch && matchesType && matchesState;
+  });
+
+  const uniqueStates = Array.from(new Set(liveResults.map(c => c.state))).sort();
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 relative overflow-hidden">
@@ -117,14 +140,14 @@ export default function HomePage() {
               Mera Vote, <span className="bg-gradient-to-r from-[#FF9933] via-[#000080] to-[#138808] bg-clip-text text-transparent">Mera Adhikaar.</span>
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
-              Exercise your fundamental democratic right under Article 326 of the Indian Constitution. 
-              Choose your local representative through a secure, Aadhaar-verified digital ballot 
+              Exercise your fundamental democratic right under Article 326 of the Indian Constitution.
+              Choose your local representative through a secure, Aadhaar-verified digital ballot
               administered by the Election Commission of Bharat (ECB).
             </p>
             <div className="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-[10px] font-bold text-red-600 dark:text-red-400 leading-tight">
-                ⚠️ LEGAL NOTICE: This website is a DUMMY PROJECT and is NOT an official government portal. 
-                Any similarity to actual persons, living or dead, or real-world political entities is purely coincidental. 
+                ⚠️ LEGAL NOTICE: This website is a DUMMY PROJECT and is NOT an official government portal.
+                Any similarity to actual persons, living or dead, or real-world political entities is purely coincidental.
                 NO REAL DATA is used or stored for illegal purposes.
               </p>
             </div>
@@ -156,8 +179,10 @@ export default function HomePage() {
               <CountdownTimer />
               <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-3xl font-black text-slate-900 dark:text-white">{stats?.totalVoters || "0"}</div>
-                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Votes Cast</div>
+                  <div className="text-3xl font-black text-slate-900 dark:text-white animate-in fade-in zoom-in duration-500">
+                    {stats?.totalVotes || "0"}
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Total Votes</div>
                 </div>
                 <div>
                   <div className="text-3xl font-black text-slate-900 dark:text-white">{stats?.totalCandidates || "0"}</div>
@@ -174,6 +199,148 @@ export default function HomePage() {
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#138808]/15 rounded-full blur-3xl -z-10" />
           </div>
         </section>
+        {/* Live Results Section */}
+        {liveResults.length > 0 && (
+          <section className="py-12 md:py-24 border-b border-slate-200 dark:border-slate-800" id="results">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]" />
+                  <span className="text-red-600 font-black text-[10px] uppercase tracking-[0.2em]">LIVE COUNTING TERMINAL</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+                  Real-Time <span className="text-[#FF9933]">Leaderboard</span>
+                </h2>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {["ALL", "MP", "MLA"].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTypeFilter(t as any)}
+                      className={`px-6 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${
+                        typeFilter === t 
+                        ? "bg-[#FF9933] text-white shadow-lg scale-105" 
+                        : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200"
+                      }`}
+                    >
+                      {t === "ALL" ? "GLOBAL VIEW" : `${t} RESULTS`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4 w-full lg:w-auto">
+                <div className="relative group flex-1 md:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#FF9933] transition-colors" />
+                  <Input 
+                    placeholder="Search Candidate / Party..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl font-bold focus:ring-[#FF9933]"
+                  />
+                </div>
+                <select 
+                  value={stateFilter}
+                  onChange={(e) => setStateFilter(e.target.value)}
+                  className="h-12 px-4 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-[#FF9933] text-slate-700 dark:text-slate-300 min-w-[160px]"
+                >
+                  <option value="ALL">All States</option>
+                  {uniqueStates.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredResults.length > 0 ? (
+                filteredResults.map((candidate, idx) => {
+                  const isLeading = idx === 0 && searchTerm === "" && typeFilter === "ALL" && stateFilter === "ALL";
+                  const voteShare = stats ? ((candidate.votes / stats.totalVotes) * 100).toFixed(1) : "0";
+                  
+                  return (
+                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+                      {/* Top Banner */}
+                      <div className={`h-2 w-full ${candidate.type === "MP" ? "bg-[#FF9933]" : "bg-[#138808]"}`} />
+                      
+                      <div className="p-8">
+                        <div className="flex items-start justify-between mb-6">
+                          <div className="relative">
+                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-md">
+                              {candidate.photo ? (
+                                <img src={candidate.photo} alt={candidate.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                              ) : (
+                                <div className="w-full h-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                                  <UserIcon className="w-8 h-8 text-slate-300" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white dark:bg-slate-900 rounded-lg p-1 shadow-md border border-slate-100 dark:border-slate-800">
+                              {candidate.symbol ? (
+                                <img src={candidate.symbol} alt={candidate.party} className="w-full h-full object-contain" />
+                              ) : (
+                                <div className="text-[8px] font-black flex items-center justify-center h-full">IND</div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant="outline" className="mb-2 text-[8px] font-black tracking-widest border-slate-200 dark:border-slate-800 text-slate-500">
+                              {candidate.type} • {candidate.state}
+                            </Badge>
+                            <div className="flex items-center justify-end gap-2 text-3xl font-black text-slate-900 dark:text-white">
+                              {candidate.votes.toLocaleString()}
+                              <TrendingUp className="w-4 h-4 text-[#138808] animate-bounce" />
+                            </div>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Validated Votes</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 mb-6">
+                          <h4 className="text-xl font-black text-slate-900 dark:text-white truncate uppercase tracking-tighter">
+                            {candidate.name}
+                          </h4>
+                          <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-slate-300" />
+                            {candidate.party}
+                          </p>
+                          <p className="text-[10px] text-[#FF9933] font-black uppercase tracking-widest">
+                            {candidate.constituency} Constituency
+                          </p>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-50 dark:border-slate-800">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Vote Share</span>
+                            <span className="text-sm font-black text-[#138808]">{voteShare}%</span>
+                          </div>
+                          <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+                            <div 
+                              className="h-full bg-gradient-to-r from-[#FF9933] to-[#e8851a] rounded-full transition-all duration-1000 shadow-sm"
+                              style={{ width: `${voteShare}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Result Status Overlay */}
+                      <div className={`py-3 px-8 flex items-center justify-center gap-2 ${idx === 0 ? "bg-[#138808]/10 text-[#138808]" : "bg-slate-50 dark:bg-slate-800/50 text-slate-500"}`}>
+                        {idx === 0 ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">
+                          {idx === 0 ? "LEADING IN TRENDS" : "TRAILING"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="col-span-full py-20 text-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                  <div className="w-16 h-16 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">No matching trends found</h3>
+                  <p className="text-slate-500 text-sm">Try adjusting your filters or search keywords.</p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* How Indian Voting Works Section */}
         <section className="py-24">
@@ -208,20 +375,20 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { 
-                icon: <Lock className="w-8 h-8 text-[#FF9933]" />, 
-                title: "Aadhaar-Grade Encryption", 
-                desc: "Your vote is sealed with AES-256 encryption, the same standard used by UIDAI for Aadhaar biometric data protection." 
+              {
+                icon: <Lock className="w-8 h-8 text-[#FF9933]" />,
+                title: "Aadhaar-Grade Encryption",
+                desc: "Your vote is sealed with AES-256 encryption, the same standard used by UIDAI for Aadhaar biometric data protection."
               },
-              { 
-                icon: <CheckCircle2 className="w-8 h-8 text-[#138808]" />, 
-                title: "VVPAT Verification", 
-                desc: "Voter-Verifiable Paper Audit Trail simulation ensures you can confirm your vote before final submission." 
+              {
+                icon: <CheckCircle2 className="w-8 h-8 text-[#138808]" />,
+                title: "VVPAT Verification",
+                desc: "Voter-Verifiable Paper Audit Trail simulation ensures you can confirm your vote before final submission."
               },
-              { 
-                icon: <Landmark className="w-8 h-8 text-[#000080]" />, 
-                title: "ECB Compliance", 
-                desc: "Adheres to the project-specific Representation of the People guidelines and project code of conduct." 
+              {
+                icon: <Landmark className="w-8 h-8 text-[#000080]" />,
+                title: "ECB Compliance",
+                desc: "Adheres to the project-specific Representation of the People guidelines and project code of conduct."
               }
             ].map((pillar, i) => (
               <div key={i} className="p-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group">
