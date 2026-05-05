@@ -93,7 +93,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   const router = useRouter();
   const partyStyle = getPartyStyle(partyName || description);
 
-  const validphotoUrl = photoURL && photoURL.trim() !== "" ? photoURL : null;
+  const validphotoUrl = photoURL && photoURL.trim() !== "" ? photoURL : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   const handleVote = async () => {
     const { data: { user } } = await supabase.auth.getUser();
