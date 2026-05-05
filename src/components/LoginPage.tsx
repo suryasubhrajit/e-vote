@@ -32,6 +32,7 @@ export default function LoginPage() {
       setDeviceWarning(`Another voter session (${activeVoter}) is currently active on this device. Multiple logins are not supported for security reasons.`);
     }
   }, []);
+
   if (loading) {
     return <Loader loading={loading} />;
   }
