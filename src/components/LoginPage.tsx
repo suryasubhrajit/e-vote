@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
 import {
@@ -22,8 +22,16 @@ import Meteors from "@/components/magicui/meteors";
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [deviceWarning, setDeviceWarning] = useState<string | null>(null);
   const { user, loading } = useAuthMiddleware();
 
+  useEffect(() => {
+    // Simulate "1 device multiple login not support"
+    const activeVoter = localStorage.getItem("active_voter_session");
+    if (activeVoter) {
+      setDeviceWarning(`Another voter session (${activeVoter}) is currently active on this device. Multiple logins are not supported for security reasons.`);
+    }
+  }, []);
   if (loading) {
     return <Loader loading={loading} />;
   }
@@ -32,16 +40,6 @@ export default function LoginPage() {
     return null;
   }
 
-  const [deviceWarning, setDeviceWarning] = useState<string | null>(null);
-
-  useState(() => {
-    // Simulate "1 device multiple login not support"
-    const activeVoter = localStorage.getItem("active_voter_session");
-    if (activeVoter) {
-      // In a real app, we'd check if this session is still valid
-      setDeviceWarning(`Another voter session (${activeVoter}) is currently active on this device. Multiple logins are not supported for security reasons.`);
-    }
-  });
 
   const handleGoogleLogin = async () => {
     if (deviceWarning) {

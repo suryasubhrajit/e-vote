@@ -91,8 +91,23 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   const router = useRouter();
   const partyStyle = getPartyStyle(partyName || description);
 
+  // Generate a deterministic seed from the candidate's name so the same
+  // candidate always gets the same realistic human photo from randomuser.me
+  const getAvatarSeed = (candidateName: string) => {
+    let hash = 0;
+    for (let i = 0; i < candidateName.length; i++) {
+      hash = (hash << 5) - hash + candidateName.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash) % 100; // randomuser.me has ~100 unique photos per gender
+  };
+
+  const seed = getAvatarSeed(name || 'candidate');
+  const gender = seed % 2 === 0 ? 'men' : 'women';
+  const photoIndex = (seed % 70) + 1; // indices 1–70 are reliably available
+
   const validphotoUrl =
-    photoURL && photoURL.trim() !== "" ? photoURL : `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(name || 'candidate')}`;
+    photoURL && photoURL.trim() !== "" ? photoURL : `https://randomuser.me/api/portraits/${gender}/${photoIndex}.jpg`;
 
   const handleVote = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -290,7 +305,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                         <div className="space-y-4">
                           <div className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30">
                             <p className="text-[10px] font-bold text-orange-600 uppercase mb-1">Primary Vision</p>
-                            <p className="text-sm font-medium italic">"{vision}"</p>
+                             <p className="text-sm font-medium italic">&quot;{vision}&quot;</p>
                           </div>
                           <ul className="space-y-2">
                             {missionList.map((m, i) => (

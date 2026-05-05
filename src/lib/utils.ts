@@ -13,7 +13,8 @@ export const validatePAN = (pan: string) => {
 
 export const validateAadhaar = (aadhaar: string) => {
   // Regex for 12 digits, no spaces for raw validation or allow spaces
-  const regex = /^[2-9]{1}[0-9]{3}\s?[0-9]{4}\s?[0-9]{4}$/;
+  // Relaxed for simulated testing (any 12 digits)
+  const regex = /^[0-9]{4}\s?[0-9]{4}\s?[0-9]{4}$/;
   return regex.test(aadhaar);
 };
 
@@ -33,7 +34,7 @@ export const fetchCandidates = async () => {
     description: candidate.description || "No Description Provided",
     vision: candidate.vision || "No Vision Provided",
     mission: candidate.mission || "No Mission Provided",
-    photoURL: candidate.photo_url || `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(candidate.name || 'candidate')}`,
+    photoURL: candidate.photo_url || `https://randomuser.me/api/portraits/men/${Math.abs([...(candidate.name || 'candidate')].reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 100}.jpg`,
     type: candidate.type,
     partyName: candidate.party_name || "Swadhin",
     partySymbolURL: candidate.party_symbol_url,

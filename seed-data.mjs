@@ -23,21 +23,21 @@ const candidates = [
     description: "Experienced leader with a vision for transparency.",
     vision: "To create a fair and accessible voting system for everyone.",
     mission: "Implementing block-chain based security for all elections.",
-    photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    photoURL: "https://i.pravatar.cc/300?u=John",
   },
   {
     name: "Jane Smith",
     description: "Community advocate focusing on local development.",
     vision: "Empowering local communities through direct participation.",
     mission: "Allocating 20% more budget to community-led initiatives.",
-    photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane",
+    photoURL: "https://i.pravatar.cc/300?u=Jane",
   },
   {
     name: "Robert Brown",
     description: "Tech innovator aiming to modernize infrastructure.",
     vision: "A digital-first approach to government services.",
     mission: "Digitizing 100% of public records by 2026.",
-    photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Robert",
+    photoURL: "https://i.pravatar.cc/300?u=Robert",
   }
 ];
 

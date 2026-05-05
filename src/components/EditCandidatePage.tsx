@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import DotPattern from "./magicui/dot-pattern";
 import { cn } from "@/lib/utils";
+import { PexelsImageSearch } from "./PexelsImageSearch";
 
 export default function EditCandidatePage() {
   const { user, loading, isAdmin } = useAuthMiddleware();
@@ -77,7 +78,7 @@ export default function EditCandidatePage() {
   if (!user || isAdmin === false) return <h1>Access Denied</h1>;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && e.target.files.length > 0) {
       const newFile = e.target.files[0];
       setFile(newFile);
 
@@ -229,7 +230,17 @@ export default function EditCandidatePage() {
           <Label htmlFor="picture" className="mt-2">
             Picture
           </Label>
-          <Input id="picture" type="file" onChange={handleFileChange} />
+          <div className="flex gap-2 items-center">
+            <Input id="picture" type="file" onChange={handleFileChange} />
+            <span className="text-sm font-medium">OR</span>
+            <PexelsImageSearch onImageSelect={(url) => {
+              setFile(null);
+              setCandidate((prev) => prev && { ...prev, photoURL: url });
+              // Reset file input
+              const fileInput = document.getElementById('picture') as HTMLInputElement;
+              if (fileInput) fileInput.value = '';
+            }} />
+          </div>
         </div>
 
         <Button

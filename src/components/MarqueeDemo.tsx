@@ -67,7 +67,14 @@ const ReviewCard = ({
     >
       <div className="flex flex-row items-center gap-2">
         <div className="w-8 h-8 overflow-hidden object-cover rounded-full">
-          <img className="" width="32" height="32" alt="" src={img} />
+          <Image 
+            className="rounded-full" 
+            width={32} 
+            height={32} 
+            alt={name} 
+            src={img} 
+            style={{ objectFit: 'cover' }}
+          />
         </div>
         <div className="flex flex-col">
           <figcaption className="font-medium text-sm dark:text-white">

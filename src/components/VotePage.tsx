@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CandidatesList from "./CandidateList";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
-import { ShieldCheck, Info, Fingerprint, CreditCard, CheckCircle2, AlertTriangle, Vote } from "lucide-react";
+import { ShieldCheck, Info, Fingerprint, CreditCard, CheckCircle2, AlertTriangle, Vote, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -248,7 +248,7 @@ const VerificationGate = ({ onVerified, user }: { onVerified: (voter: any) => vo
 };
 
 export default function VotePage() {
-  const { user } = useAuthMiddleware();
+  const { user, loading: authLoading } = useAuthMiddleware();
   const [isVerified, setIsVerified] = useState(false);
   const [verifiedVoter, setVerifiedVoter] = useState<any>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -256,7 +256,7 @@ export default function VotePage() {
   const [votedMP, setVotedMP] = useState(false);
   const [votedMLA, setVotedMLA] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
     try {
@@ -267,6 +267,34 @@ export default function VotePage() {
         .eq('id', user.id)
         .single();
 
+      let isVerifiedNow = false;
+      let voterData = null;
+
+      if (profile && profile.is_voter_verified && profile.voters) {
+        voterData = profile.voters;
+        isVerifiedNow = true;
+      } else {
+        // Mutual linking: Fetch directly from voters table if profile isn't updated
+        const { data: linkedVoter } = await supabase
+          .from('voters')
+          .select('*')
+          .eq('linked_profile_id', user.id)
+          .single();
+
+        if (linkedVoter) {
+          voterData = linkedVoter;
+          isVerifiedNow = true;
+
+          // Repair the mutual link in profile silently
+          await supabase.from('profiles').update({
+            is_voter_verified: true,
+            linked_voter_id: linkedVoter.id,
+            state: linkedVoter.state,
+            constituency_mp: linkedVoter.constituency_mp,
+            constituency_mla: linkedVoter.constituency_mla
+          }).eq('id', user.id);
+        }
+      }
       if (profile) {
         // 1b. Check if voted in the dedicated 'votes' table
         const { data: votesData } = await supabase
@@ -280,21 +308,21 @@ export default function VotePage() {
         setVotedMP(votedMPStatus);
         setVotedMLA(votedMLAStatus);
         
-        if (profile.is_voter_verified && profile.voters) {
-          setVerifiedVoter(profile.voters);
+        if (isVerifiedNow && voterData) {
+          setVerifiedVoter(voterData);
           setIsVerified(true);
           
           // 2. Fetch candidates for THIS voter's specific constituency
           const { data: candData } = await supabase
             .from('candidates')
             .select('*')
-            .eq('state', profile.voters.state)
-            .or(`constituency.eq.${profile.voters.constituency_mp},constituency.eq.${profile.voters.constituency_mla}`);
+            .eq('state', voterData.state)
+            .or(`constituency.eq.${voterData.constituency_mp},constituency.eq.${voterData.constituency_mla}`);
 
           if (candData) {
             setCandidates(candData.map(c => ({
               ...c,
-              photoURL: c.photo_url || `https://api.dicebear.com/9.x/micah/svg?seed=${encodeURIComponent(c.name || 'candidate')}`,
+              photoURL: c.photo_url || `https://randomuser.me/api/portraits/men/${Math.abs([...(c.name || 'candidate')].reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 100}.jpg`,
               partySymbolURL: c.party_symbol_url,
               id: c.id,
               name: c.name,
@@ -322,11 +350,22 @@ export default function VotePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadData();
-  }, [user]);
+  }, [loadData]);
+
+  if (authLoading || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-[#FF9933]" />
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Secure Terminal Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isVerified) {
     return <VerificationGate user={user} onVerified={(voter) => {

@@ -17,6 +17,8 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { PexelsImageSearch } from "./PexelsImageSearch";
+import Image from "next/image";
 
 
 export default function CreateCandidatePage() {
@@ -26,6 +28,7 @@ export default function CreateCandidatePage() {
   const [vision, setVision] = useState("");
   const [mission, setMission] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [pexelsUrl, setPexelsUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
 
@@ -34,41 +37,48 @@ export default function CreateCandidatePage() {
   if (!user || isAdmin === false) return <h1>Access Denied</h1>;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
+      setPexelsUrl("");
     }
   };
 
   const handleSubmit = async () => {
-    if (!file) {
-      toast.error("Please select a photo");
+    if (!file && !pexelsUrl) {
+      toast.error("Please select or search for a photo");
       return;
     }
 
     setUploading(true);
 
     try {
-      // Upload file to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      let finalPhotoUrl = pexelsUrl;
 
-      const { error: uploadError, data } = await supabase.storage
-        .from('candidates')
-        .upload(filePath, file);
+      if (file) {
+        // Upload file to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-      if (uploadError) throw uploadError;
+        const { error: uploadError, data } = await supabase.storage
+          .from('candidates')
+          .upload(filePath, file);
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('candidates')
-        .getPublicUrl(filePath);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('candidates')
+          .getPublicUrl(filePath);
+
+        finalPhotoUrl = publicUrl;
+      }
 
       const { error: insertError } = await supabase
         .from('candidates')
         .insert({
           name,
           description,
-          photo_url: publicUrl,
+          photo_url: finalPhotoUrl,
           vision,
           mission,
         });
@@ -81,6 +91,7 @@ export default function CreateCandidatePage() {
       setVision("");
       setMission("");
       setFile(null);
+      setPexelsUrl("");
 
       toast.success("Candidate created successfully");
       router.push("/dashboard/candidates");
@@ -160,7 +171,22 @@ export default function CreateCandidatePage() {
 
       <div className="grid w-full gap-1.5 max-w-sm mt-4">
         <Label htmlFor="picture">Picture</Label>
-        <Input id="picture" type="file" onChange={handleFileChange} />
+        <div className="flex gap-2 items-center">
+          <Input id="picture" type="file" onChange={handleFileChange} />
+          <span className="text-sm font-medium">OR</span>
+          <PexelsImageSearch onImageSelect={(url) => {
+            setPexelsUrl(url);
+            setFile(null);
+            // Reset file input
+            const fileInput = document.getElementById('picture') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+          }} />
+        </div>
+        {pexelsUrl && (
+          <div className="mt-2 relative w-32 h-32 rounded-md overflow-hidden border">
+            <Image src={pexelsUrl} alt="Selected from Pexels" fill className="object-cover" />
+          </div>
+        )}
       </div>
 
       <Button
