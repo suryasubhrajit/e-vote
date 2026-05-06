@@ -38,6 +38,7 @@ export const useAuthMiddleware = () => {
   }, []);
 
   const [isVoterVerified, setIsVoterVerified] = useState<boolean | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -45,13 +46,14 @@ export const useAuthMiddleware = () => {
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('is_admin, is_voter_verified')
+            .select('is_admin, is_voter_verified, name')
             .eq('id', user.id)
             .single();
 
           if (error) throw error;
           setIsAdmin(data?.is_admin || false);
           setIsVoterVerified(data?.is_voter_verified || false);
+          setProfileName(data?.name || null);
         } catch (error) {
           console.error("Error fetching user data:", error);
           setIsAdmin(false);
@@ -60,6 +62,7 @@ export const useAuthMiddleware = () => {
       } else {
         setIsAdmin(null);
         setIsVoterVerified(null);
+        setProfileName(null);
       }
     };
 
@@ -81,6 +84,6 @@ export const useAuthMiddleware = () => {
     }
   }, [user, loading, router, isAdmin]);
 
-  return { user, loading, isAdmin, isVoterVerified };
+  return { user, loading, isAdmin, isVoterVerified, profileName };
 };
 

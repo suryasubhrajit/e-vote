@@ -32,7 +32,7 @@ import Meteors from "@/components/magicui/meteors";
 
 
 export default function Navbar() {
-  const { user, isAdmin, isVoterVerified } = useAuthMiddleware();
+  const { user, isAdmin, isVoterVerified, profileName } = useAuthMiddleware();
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -133,7 +133,7 @@ export default function Navbar() {
                             {user.user_metadata?.full_name?.[0] || user.email?.[0]?.toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium hidden lg:inline">{user.user_metadata?.full_name || user.email}</span>
+                        <span className="text-sm font-medium hidden lg:inline">{profileName || user.user_metadata?.full_name || user.email}</span>
                       </div>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-[#0f172a] text-white border-slate-800 shadow-2xl p-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -170,7 +170,7 @@ export default function Navbar() {
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-center relative z-10">
-                              <h3 className="text-2xl font-black text-white leading-tight">{user.user_metadata?.full_name}</h3>
+                              <h3 className="text-2xl font-black text-white leading-tight">{profileName || user.user_metadata?.full_name}</h3>
                               <Badge className={`mt-3 px-4 py-1 text-[10px] font-black tracking-[0.2em] border-none shadow-lg ${isVoterVerified ? "bg-green-500 text-white" : "bg-amber-500 text-white"}`}>
                                 {isVoterVerified ? "AUTHORIZED" : "PENDING"}
                               </Badge>
