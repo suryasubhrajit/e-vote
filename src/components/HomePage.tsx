@@ -91,6 +91,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<"ALL" | "MP" | "MLA">("ALL");
   const [stateFilter, setStateFilter] = useState("ALL");
+  const [displayLimit, setDisplayLimit] = useState(6);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -101,7 +102,7 @@ export default function HomePage() {
           getParties()
         ]);
         setStats(statsData);
-        setLiveResults(resultsData.slice(0, 5)); // Show top 5
+        setLiveResults(resultsData); // Store ALL results for global view
         setParties(partiesData);
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -118,6 +119,8 @@ export default function HomePage() {
     const matchesState = stateFilter === "ALL" || candidate.state === stateFilter;
     return matchesSearch && matchesType && matchesState;
   });
+
+  const displayedResults = filteredResults.slice(0, displayLimit);
 
   const uniqueStates = Array.from(new Set(liveResults.map(c => c.state))).sort();
 
@@ -260,8 +263,8 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredResults.length > 0 ? (
-                filteredResults.map((candidate, idx) => {
+              {displayedResults.length > 0 ? (
+                displayedResults.map((candidate, idx) => {
                   const isLeading = idx === 0 && searchTerm === "" && typeFilter === "ALL" && stateFilter === "ALL";
                   const voteShare = stats ? ((candidate.votes / stats.totalVotes) * 100).toFixed(1) : "0";
                   
@@ -386,6 +389,17 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+
+            {filteredResults.length > displayLimit && (
+              <div className="mt-16 text-center">
+                <Button 
+                  onClick={() => setDisplayLimit(prev => prev + 6)}
+                  className="px-12 h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
+                >
+                  View More Global Trends
+                </Button>
+              </div>
+            )}
           </section>
         )}
 
