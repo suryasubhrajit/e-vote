@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { Landmark, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
     <footer className="bg-[#1a1a2e] text-slate-400 py-12 border-t border-white/5">
       <div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-lg flex items-center justify-center">
-            <Landmark className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg overflow-hidden p-1 shrink-0">
+            <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
           </div>
           <div>
             <div className="text-white font-black uppercase tracking-widest text-sm">ECB E-Vote Platform</div>
