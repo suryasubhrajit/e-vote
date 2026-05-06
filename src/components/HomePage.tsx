@@ -270,7 +270,7 @@ export default function HomePage() {
                   const voteShare = stats ? ((candidate.votes / stats.totalVotes) * 100).toFixed(1) : "0";
                   
                   return (
-                    <div key={idx} className={`relative bg-white dark:bg-slate-900 rounded-[2.5rem] border ${idx === 0 ? 'border-[#138808] ring-1 ring-[#138808]/20 shadow-[0_20px_50px_rgba(19,136,8,0.1)]' : 'border-slate-200 dark:border-slate-800 shadow-xl'} overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}>
+                    <div key={idx} className={`relative bg-white dark:bg-slate-900 rounded-[2.5rem] border ${isLeading ? 'border-[#138808] ring-1 ring-[#138808]/20 shadow-[0_20px_50px_rgba(19,136,8,0.1)]' : 'border-slate-200 dark:border-slate-800 shadow-xl'} overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}>
                       {/* Top Accent Bar */}
                       <div className={`h-2.5 w-full ${candidate.type === "MP" ? "bg-gradient-to-r from-[#FF9933] to-[#FFCC33]" : "bg-gradient-to-r from-[#138808] to-[#99FF99]"}`} />
                       
@@ -368,14 +368,14 @@ export default function HomePage() {
                       </div>
 
                       {/* Professional Status Bar */}
-                      <div className={`py-4 px-8 flex items-center justify-between ${idx === 0 ? "bg-[#138808] text-white" : "bg-slate-50 dark:bg-slate-800/80 text-slate-500"}`}>
+                      <div className={`py-4 px-8 flex items-center justify-between ${isLeading ? "bg-[#138808] text-white" : "bg-slate-50 dark:bg-slate-800/80 text-slate-500"}`}>
                         <div className="flex items-center gap-2">
                           {isLeading ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
                           <span className="text-[11px] font-black uppercase tracking-[0.2em]">
                             {isLeading ? `LEADING IN ${candidate.constituency}` : `TRAILING IN ${candidate.constituency}`}
                           </span>
                         </div>
-                        {idx === 0 && (
+                        {isLeading && (
                             <div className="flex gap-1">
                                 {[1,2,3].map(i => <div key={i} className="w-1 h-1 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />)}
                             </div>
