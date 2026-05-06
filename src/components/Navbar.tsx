@@ -261,9 +261,10 @@ export default function Navbar() {
               {isOpen ? <AiOutlineClose /> : <BsList />}
             </button>
           </div>
-        </div>
+        </header>
+      </div>
 
-        {/* Mobile Sidebar */}
+      {/* Mobile Sidebar */}
         <div className={`fixed inset-0 bg-[#0f172a] z-[100] transition-all duration-500 ${isOpen ? "translate-x-0" : "translate-x-full"} md:hidden flex flex-col`}>
           {/* Header Area */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
@@ -342,7 +343,6 @@ export default function Navbar() {
             </p>
           </div>
         </div>
-      </header>
     </>
   );
 }
