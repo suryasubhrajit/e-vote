@@ -55,6 +55,7 @@ const CountdownTimer = memo(function CountdownTimer() {
     </div>
   );
 });
+CountdownTimer.displayName = "CountdownTimer";
 
 // Spinning Ashoka Chakra SVG
 const AshokaChakra = memo(function AshokaChakra({ className = "w-12 h-12" }: { className?: string }) {
@@ -76,6 +77,7 @@ const AshokaChakra = memo(function AshokaChakra({ className = "w-12 h-12" }: { c
     </svg>
   );
 });
+AshokaChakra.displayName = "AshokaChakra";
 
 export default function HomePage() {
   const { user } = useAuthMiddleware();
