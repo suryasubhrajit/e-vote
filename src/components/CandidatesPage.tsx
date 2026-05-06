@@ -26,6 +26,9 @@ function CandidatesContent() {
 
   useEffect(() => {
     const loadData = async () => {
+      // Only show loader if we don't have candidates yet
+      setIsLoading(prev => candidates.length === 0);
+      
       const [candData, partyData] = await Promise.all([
         fetchCandidates(),
         getParties()
@@ -180,7 +183,7 @@ function CandidatesContent() {
         </div>
 
         {/* Candidates Grid */}
-        {isLoading ? (
+        {isLoading && candidates.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="h-[500px] bg-slate-200 dark:bg-slate-800 animate-pulse rounded-3xl" />

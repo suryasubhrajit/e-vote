@@ -261,7 +261,10 @@ export default function VotePage() {
 
   const loadData = useCallback(async () => {
     if (!user) return;
-    setIsLoading(true);
+    
+    // Only show full-screen loader if we have no candidates yet
+    // Otherwise, refresh data silently in the background
+    setIsLoading(prev => candidates.length === 0);
     try {
       // 1. Fetch Profile and check verification
       const { data: profile } = await supabase

@@ -21,7 +21,14 @@ export const useAuthMiddleware = () => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const newUser = session?.user ?? null;
+      
+      setUser(prevUser => {
+        // Only trigger a re-render if the user ID has actually changed
+        if (prevUser?.id === newUser?.id) return prevUser;
+        return newUser;
+      });
+      
       setLoading(false);
     });
 
