@@ -70,6 +70,7 @@ export default function EditCandidatePage() {
             liabilities: data.liabilities || "",
             criminal_records: data.criminal_records || "",
             district: data.district || "",
+            gender: data.gender || "",
           });
 
           setName(data.name || "");
