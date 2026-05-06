@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BsList } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
+import Image from "next/image";
 import { 
   Dialog, 
   DialogContent, 
@@ -85,8 +86,8 @@ export default function Navbar() {
         <div className="mx-auto px-4 md:px-8 lg:px-12 flex justify-between items-center py-3">
           <h1 className="font-bold text-xl tracking-tight flex items-center gap-2">
             <Link href={"/"} className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-lg flex items-center justify-center shadow-md">
-                <Landmark className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden p-1">
+                <Image src="https://iili.io/BZECcMl.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-black tracking-wide leading-tight">Bharat Election Project</span>
@@ -144,8 +145,9 @@ export default function Navbar() {
                           <div className="flex-1 bg-[#138808]" />
                         </div>
                         <DialogHeader className="bg-[#0f172a]/95 backdrop-blur-md p-6 pb-4 border-b border-white/5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                          <div className="flex items-center gap-3">
+                            <Image src="https://iili.io/BZECcMl.png" alt="ECB Logo" width={48} height={48} className="object-contain" />
+                            <div className="bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-xl flex items-center justify-center shadow-lg shrink-0">
                               <ShieldCheck className="w-6 h-6 text-white" />
                             </div>
                             <div>

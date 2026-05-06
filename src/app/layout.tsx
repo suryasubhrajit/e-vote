@@ -12,6 +12,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Bharat Election Portal — Lok Sabha 2029",
   description: "Digital Voting Platform for Indian Parliamentary Elections | भारत निर्वाचन पोर्टल",
+  icons: {
+    icon: "https://iili.io/BZECcMl.png",
+    apple: "https://iili.io/BZECcMl.png",
+  },
 };
 
 export default function RootLayout({
