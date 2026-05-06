@@ -261,8 +261,9 @@ export default function Navbar() {
               {isOpen ? <AiOutlineClose /> : <BsList />}
             </button>
           </div>
-        </header>
-      </div>
+        </div>
+      </header>
+    </div>
 
       {/* Mobile Sidebar */}
         <div className={`fixed inset-0 bg-[#0f172a] z-[100] transition-all duration-500 ${isOpen ? "translate-x-0" : "translate-x-full"} md:hidden flex flex-col`}>
