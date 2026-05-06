@@ -90,6 +90,7 @@ const VerificationGate = ({ onVerified, user }: { onVerified: (voter: any) => vo
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
+          name: matchedVoter.full_name, // Sync legal name from database
           is_voter_verified: true,
           linked_voter_id: matchedVoter.id,
           state: matchedVoter.state,
