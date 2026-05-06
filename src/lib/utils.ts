@@ -151,7 +151,34 @@ export async function getLiveResults() {
       tally[id].votes++;
     });
 
-    return Object.values(tally).sort((a, b) => b.votes - a.votes);
+    const candidates = Object.values(tally);
+
+    // Group by Constituency to find local leaders and margins
+    const constituencyGroups: Record<string, any[]> = {};
+    candidates.forEach(c => {
+      const key = `${c.type}-${c.state}-${c.constituency}`;
+      if (!constituencyGroups[key]) constituencyGroups[key] = [];
+      constituencyGroups[key].push(c);
+    });
+
+    // Calculate status and margin for each candidate
+    candidates.forEach(c => {
+      const key = `${c.type}-${c.state}-${c.constituency}`;
+      const localCandidates = [...constituencyGroups[key]].sort((a, b) => b.votes - a.votes);
+      
+      const leader = localCandidates[0];
+      const runnerUp = localCandidates[1] || { votes: 0 };
+
+      if (c.id === leader.id) {
+        c.status = "LEADING";
+        c.margin = c.votes - runnerUp.votes;
+      } else {
+        c.status = "TRAILING";
+        c.margin = leader.votes - c.votes;
+      }
+    });
+
+    return candidates.sort((a, b) => b.votes - a.votes);
   } catch (error) {
     console.error("Error fetching live results:", error);
     return [];

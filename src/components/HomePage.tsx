@@ -265,7 +265,8 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayedResults.length > 0 ? (
                 displayedResults.map((candidate, idx) => {
-                  const isLeading = idx === 0 && searchTerm === "" && typeFilter === "ALL" && stateFilter === "ALL";
+                  const isLeading = candidate.status === "LEADING";
+                  const margin = candidate.margin || 0;
                   const voteShare = stats ? ((candidate.votes / stats.totalVotes) * 100).toFixed(1) : "0";
                   
                   return (
@@ -341,10 +342,14 @@ export default function HomePage() {
                         <div className="space-y-4">
                           <div className="flex justify-between items-end">
                             <div className="space-y-1">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Vote Share</p>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                {isLeading ? "Lead Margin" : "Trailing By"}
+                              </p>
                               <div className="flex items-baseline gap-2">
-                                <span className="text-2xl font-black text-[#138808]">{voteShare}%</span>
-                                {idx === 0 && <span className="text-[10px] font-bold text-[#138808] bg-[#138808]/10 px-2 py-0.5 rounded-full">+2.4%</span>}
+                                <span className={`text-2xl font-black ${isLeading ? "text-[#138808]" : "text-red-500"}`}>
+                                  {margin.toLocaleString()}
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase">Votes</span>
                               </div>
                             </div>
                             {candidate.gender && (
@@ -365,9 +370,9 @@ export default function HomePage() {
                       {/* Professional Status Bar */}
                       <div className={`py-4 px-8 flex items-center justify-between ${idx === 0 ? "bg-[#138808] text-white" : "bg-slate-50 dark:bg-slate-800/80 text-slate-500"}`}>
                         <div className="flex items-center gap-2">
-                          {idx === 0 ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                          {isLeading ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
                           <span className="text-[11px] font-black uppercase tracking-[0.2em]">
-                            {idx === 0 ? "LEADING IN TRENDS" : "TRAILING"}
+                            {isLeading ? `LEADING IN ${candidate.constituency}` : `TRAILING IN ${candidate.constituency}`}
                           </span>
                         </div>
                         {idx === 0 && (
