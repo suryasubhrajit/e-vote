@@ -89,9 +89,9 @@ export default function Navbar() {
               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden p-1">
                 <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-black tracking-wide leading-tight">Bharat Election Project</span>
-                <span className="text-[9px] font-medium text-slate-400 tracking-widest uppercase">Election Commission of Bharat (ECB)</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[11px] md:text-sm font-black tracking-wide leading-tight truncate">Bharat Election Project</span>
+                <span className="text-[8px] md:text-[9px] font-medium text-slate-400 tracking-wider md:tracking-widest uppercase truncate">Election Commission of Bharat (ECB)</span>
               </div>
             </Link>
           </h1>
@@ -144,15 +144,17 @@ export default function Navbar() {
                           <div className="flex-1 bg-white" />
                           <div className="flex-1 bg-[#138808]" />
                         </div>
-                        <DialogHeader className="bg-[#0f172a]/95 backdrop-blur-md p-6 pb-4 border-b border-white/5">
+                        <DialogHeader className="bg-[#0f172a]/95 backdrop-blur-md p-4 md:p-6 pb-4 border-b border-white/5">
                           <div className="flex items-center gap-3">
-                            <Image src="https://iili.io/BZECcMl.png" alt="ECB Logo" width={48} height={48} className="object-contain" />
-                            <div className="bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-xl flex items-center justify-center shadow-lg shrink-0">
-                              <ShieldCheck className="w-6 h-6 text-white" />
+                            <div className="relative w-10 h-10 md:w-12 md:h-12 shrink-0">
+                              <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" fill className="object-contain" />
                             </div>
-                            <div>
-                              <DialogTitle className="text-xl font-black tracking-tight uppercase">Voter Digital Passport</DialogTitle>
-                              <DialogDescription className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                            <div className="bg-gradient-to-br from-[#FF9933] to-[#e8851a] rounded-xl flex items-center justify-center shadow-lg shrink-0 w-8 h-8 md:w-10 md:h-10">
+                              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                            </div>
+                            <div className="min-w-0 text-left">
+                              <DialogTitle className="text-base md:text-xl font-black tracking-tight uppercase truncate">Voter Digital Passport</DialogTitle>
+                              <DialogDescription className="text-slate-400 text-[8px] md:text-[10px] font-bold uppercase tracking-widest mt-0.5 truncate">
                                 Government of Bharat • Official Identity Terminal
                               </DialogDescription>
                             </div>
@@ -260,7 +262,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Sidebar */}
-        <div className={`fixed inset-0 bg-[#1a1a2e]/98 z-[60] transition-all duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"} md:hidden`}>
+        <div className={`fixed inset-0 bg-[#1a1a2e] z-[100] transition-all duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"} md:hidden`}>
           <div className="flex justify-end p-8">
             <button onClick={toggleSidebar} className="text-white text-3xl">
               <AiOutlineClose />

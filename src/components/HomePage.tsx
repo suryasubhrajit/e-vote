@@ -143,14 +143,17 @@ export default function HomePage() {
         {/* Hero Section */}
         <section className="grid lg:grid-cols-2 gap-12 items-center py-12 md:py-24 border-b border-slate-200 dark:border-slate-800">
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={48} height={48} className="object-contain" />
-              <Badge variant="outline" className="border-[#000080] dark:border-[#FF9933] text-[#000080] dark:text-[#FF9933] px-4 py-1.5 text-xs font-black uppercase tracking-widest">
-                18th Lok Sabha General Election 2029
-              </Badge>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex items-center gap-3">
+                <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={40} height={40} className="object-contain" />
+                <Badge variant="outline" className="border-[#000080] dark:border-[#FF9933] text-[#000080] dark:text-[#FF9933] px-3 py-1.5 text-[10px] font-black uppercase tracking-widest leading-none">
+                  Lok Sabha 2029
+                </Badge>
+              </div>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
-              Mera Vote, <span className="bg-gradient-to-r from-[#FF9933] via-[#000080] to-[#138808] bg-clip-text text-transparent">Mera Adhikaar.</span>
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
+              Mera Vote, <br className="sm:hidden" />
+              <span className="bg-gradient-to-r from-[#FF9933] via-[#000080] to-[#138808] bg-clip-text text-transparent">Mera Adhikaar.</span>
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
               Exercise your fundamental democratic right under Article 326 of the Indian Constitution.
