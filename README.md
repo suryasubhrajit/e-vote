@@ -9,7 +9,7 @@
 ---
 
 ## 🌟 Project Overview
-The **ECB E-Vote Platform** is a high-fidelity full-stack simulation of a modern electronic voting ecosystem. It addresses the critical challenges of **security**, **transparency**, and **accessibility** in digital voting. By integrating Aadhaar-linked verification and real-time data synchronization, it provides a "Production-Grade" experience for both voters and election observers.
+The **ECB E-Vote Platform** is a secure, real-time digital voting terminal featuring Aadhaar-linked voter verification and live broadcast-style result tracking.
 
 > **Note:** This project was developed as a sophisticated demonstration of secure full-stack architecture, focusing on electoral logic and identity verification.
 

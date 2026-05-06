@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ECB E-Vote Platform — Election Commission of Bharat",
-  description: "Official Electronic Voting Platform of the Election Commission of Bharat (ECB). Secure, Aadhaar-verified digital voting for a transparent democracy.",
+  description: "Official ECB E-Vote Platform: Secure Aadhaar-verified digital voting with real-time result tracking.",
   keywords: ["Election Commission of Bharat", "ECB", "E-Vote", "Digital Voting", "Electronic Voting Platform", "Aadhaar Voting", "Voter Verification"],
   authors: [{ name: "Election Commission of Bharat (Simulated)" }],
   openGraph: {
