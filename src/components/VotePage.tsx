@@ -359,6 +359,9 @@ export default function VotePage() {
     loadData();
   }, [loadData]);
 
+  const mpCandidates = candidates.filter(c => c.type === 'MP' && c.constituency === verifiedVoter?.constituency_mp);
+  const mlaCandidates = candidates.filter(c => c.type === 'MLA' && c.constituency === verifiedVoter?.constituency_mla);
+
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -391,8 +394,6 @@ export default function VotePage() {
     }} />;
   }
 
-  const mpCandidates = candidates.filter(c => c.type === 'MP' && c.constituency === verifiedVoter?.constituency_mp);
-  const mlaCandidates = candidates.filter(c => c.type === 'MLA' && c.constituency === verifiedVoter?.constituency_mla);
 
   const displayedMP = mpCandidates.slice(0, displayLimitMP);
   const displayedMLA = mlaCandidates.slice(0, displayLimitMLA);
