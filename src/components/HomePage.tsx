@@ -16,7 +16,7 @@ import { memo } from "react";
 const Meteors = dynamic(() => import("@/components/magicui/meteors"), { ssr: false });
 const RetroGrid = dynamic(() => import("@/components/magicui/retro-grid"), { ssr: false });
 
-const CountdownTimer = memo(() => {
+const CountdownTimer = memo(function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
@@ -57,23 +57,25 @@ const CountdownTimer = memo(() => {
 });
 
 // Spinning Ashoka Chakra SVG
-const AshokaChakra = memo(({ className = "w-12 h-12" }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" className={`${className} animate-spin`} style={{ animationDuration: "20s" }}>
-    <circle cx="50" cy="50" r="45" fill="none" stroke="#000080" strokeWidth="3" />
-    <circle cx="50" cy="50" r="8" fill="#000080" />
-    {[...Array(24)].map((_, i) => (
-      <line
-        key={i}
-        x1="50"
-        y1="50"
-        x2={50 + 42 * Math.cos((i * 15 * Math.PI) / 180)}
-        y2={50 + 42 * Math.sin((i * 15 * Math.PI) / 180)}
-        stroke="#000080"
-        strokeWidth="1.5"
-      />
-    ))}
-  </svg>
-));
+const AshokaChakra = memo(function AshokaChakra({ className = "w-12 h-12" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={`${className} animate-spin`} style={{ animationDuration: "20s" }}>
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#000080" strokeWidth="3" />
+      <circle cx="50" cy="50" r="8" fill="#000080" />
+      {[...Array(24)].map((_, i) => (
+        <line
+          key={i}
+          x1="50"
+          y1="50"
+          x2={50 + 42 * Math.cos((i * 15 * Math.PI) / 180)}
+          y2={50 + 42 * Math.sin((i * 15 * Math.PI) / 180)}
+          stroke="#000080"
+          strokeWidth="1.5"
+        />
+      ))}
+    </svg>
+  );
+});
 
 export default function HomePage() {
   const { user } = useAuthMiddleware();
