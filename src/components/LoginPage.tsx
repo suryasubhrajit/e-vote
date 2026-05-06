@@ -90,7 +90,7 @@ export default function LoginPage() {
             </div>
             <CardTitle className="text-2xl font-black">Voter Authentication</CardTitle>
             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">
-              Bharat Election Project • ECB Digital Terminal
+              ECB E-Vote Platform • ECB Digital Terminal
             </p>
             <CardDescription>
               <p className="mt-6 mb-2 text-sm">

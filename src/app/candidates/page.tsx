@@ -1,7 +1,7 @@
 import CandidatesPage from "@/components/CandidatesPage";
 
 export const metadata = {
-  title: "Candidates List | Bharat Election Project",
+  title: "Candidate Directory | ECB E-Vote Platform",
   description: "View the list of candidates contesting in the National Elections. Explore their manifestos, education, and assets.",
 };
 

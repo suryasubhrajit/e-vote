@@ -10,7 +10,7 @@ export default function Footer() {
             <Landmark className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="text-white font-black uppercase tracking-widest text-sm">Bharat Election Project</div>
+            <div className="text-white font-black uppercase tracking-widest text-sm">ECB E-Vote Platform</div>
             <div className="text-[10px] uppercase tracking-widest text-slate-500">© 2029 Election Commission of Bharat (ECB) — Non-Governmental Simulation</div>
           </div>
         </div>
@@ -21,7 +21,7 @@ export default function Footer() {
             <Link href="/about" className="hover:text-[#FF9933] transition-colors">Help Desk</Link>
           </div>
           <p className="text-[9px] text-slate-600 max-w-xs text-center md:text-right leading-tight italic">
-            This is a mock project for academic and educational purposes. It does not process real ballots or influence real-world elections.
+              ECB E-Vote Platform for academic and educational purposes. It does not process real ballots or influence real-world elections.
           </p>
         </div>
       </div>

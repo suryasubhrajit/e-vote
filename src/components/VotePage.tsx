@@ -136,7 +136,7 @@ const VerificationGate = ({ onVerified, user }: { onVerified: (voter: any) => vo
               <Fingerprint className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
-              Bharat Election Project
+              ECB E-Vote Platform
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Identity Verification via Aadhaar & EPIC (Voter ID)

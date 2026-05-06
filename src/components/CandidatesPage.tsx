@@ -220,7 +220,7 @@ function CandidatesContent() {
         {/* ECB Project Footer */}
         <div className="mt-20 pt-8 border-t border-slate-200 dark:border-slate-800 text-center">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]">
-            Digital Candidate Directory v1.0 • Bharat Election Project (ECB)
+            Digital Candidate Directory v1.0 • ECB E-Vote Platform
           </p>
         </div>
       </div>
