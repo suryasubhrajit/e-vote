@@ -264,32 +264,34 @@ export default function Navbar() {
         {/* Mobile Sidebar */}
         <div className={`fixed inset-0 bg-[#0f172a] z-[100] transition-all duration-500 ${isOpen ? "translate-x-0" : "translate-x-full"} md:hidden flex flex-col`}>
           {/* Header Area */}
-          <div className="flex items-center justify-between p-6 border-b border-white/5">
-            <div className="flex items-center gap-3">
-              <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
-              <span className="text-sm font-black tracking-widest uppercase">ECB Portal</span>
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+            <div className="flex items-center gap-2.5">
+              <div className="relative w-8 h-8 shrink-0">
+                <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" fill className="object-contain" />
+              </div>
+              <span className="text-xs font-black tracking-[0.2em] uppercase text-white/90">ECB Digital Portal</span>
             </div>
-            <button onClick={toggleSidebar} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
-              <AiOutlineClose className="text-xl" />
+            <button onClick={toggleSidebar} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+              <AiOutlineClose className="text-lg" />
             </button>
           </div>
 
-          <nav className="flex-1 px-6 py-12 overflow-y-auto">
-            <ul className="flex flex-col gap-4">
+          <nav className="flex-1 px-4 py-8 overflow-y-auto">
+            <ul className="flex flex-col gap-2.5">
               {[
-                { name: "Home", href: "/", icon: <Globe className="w-5 h-5" /> },
-                { name: "About", href: "/about", icon: <Landmark className="w-5 h-5" /> },
-                { name: "Candidates", href: "/candidates", icon: <Users className="w-5 h-5" /> },
-                { name: "Vote", href: "/vote", icon: <Vote className="w-5 h-5" /> },
+                { name: "Home", href: "/", icon: <Globe className="w-4 h-4" /> },
+                { name: "About", href: "/about", icon: <Landmark className="w-4 h-4" /> },
+                { name: "Candidates", href: "/candidates", icon: <Users className="w-4 h-4" /> },
+                { name: "Vote", href: "/vote", icon: <Vote className="w-4 h-4" /> },
               ].map((item) => (
                 <li key={item.name}>
                   <Link 
                     href={item.href} 
                     onClick={toggleSidebar} 
-                    className={`flex items-center gap-4 p-5 rounded-2xl transition-all font-black uppercase tracking-widest text-sm ${
+                    className={`flex items-center gap-4 p-4 rounded-xl transition-all font-bold uppercase tracking-widest text-[11px] ${
                       pathname === item.href 
-                      ? "bg-[#FF9933] text-white shadow-lg" 
-                      : "bg-white/5 text-slate-300 hover:bg-white/10"
+                      ? "bg-[#FF9933] text-white shadow-lg scale-[0.98]" 
+                      : "bg-white/5 text-slate-400 hover:bg-white/10"
                     }`}
                   >
                     <span className={pathname === item.href ? "text-white" : "text-[#FF9933]"}>
@@ -303,24 +305,24 @@ export default function Navbar() {
           </nav>
 
           {/* Footer Area */}
-          <div className="p-8 border-t border-white/5 bg-white/5">
+          <div className="p-6 border-t border-white/5 bg-slate-900/50">
             {user ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 px-2">
-                  <div className="w-10 h-10 rounded-full bg-[#FF9933] flex items-center justify-center font-black text-white">
+                <div className="flex items-center gap-3 px-1">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF9933] to-[#e8851a] flex items-center justify-center font-black text-white text-xs shadow-lg">
                     {user.email?.[0].toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Session</p>
-                    <p className="text-xs font-bold text-white truncate">{user.email}</p>
+                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">Active Session</p>
+                    <p className="text-[11px] font-bold text-white truncate opacity-90">{user.email}</p>
                   </div>
                 </div>
                 {!isVoterVerified ? (
-                  <Button onClick={handleLogout} variant="destructive" className="w-full h-14 rounded-2xl font-black uppercase tracking-widest">
+                  <Button onClick={handleLogout} variant="destructive" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg">
                     Sign Out Terminal
                   </Button>
                 ) : (
-                  <Button disabled variant="outline" className="w-full h-14 rounded-2xl border-slate-700 text-slate-500 font-black uppercase tracking-widest opacity-50">
+                  <Button disabled variant="outline" className="w-full h-12 rounded-xl border-slate-800 text-slate-600 font-black uppercase tracking-widest text-[10px] opacity-40">
                     Sign Out Locked
                   </Button>
                 )
@@ -328,13 +330,13 @@ export default function Navbar() {
               </div>
             ) : (
               <Link href="/auth/login" onClick={toggleSidebar}>
-                <Button className="w-full h-14 bg-[#FF9933] hover:bg-[#e8851a] text-white font-black uppercase tracking-widest rounded-2xl">
+                <Button className="w-full h-12 bg-[#FF9933] hover:bg-[#e8851a] text-white font-black uppercase tracking-widest rounded-xl text-[10px] shadow-lg">
                   Sign In to Verify
                 </Button>
               </Link>
             )}
-            <p className="text-center text-[8px] text-slate-600 font-bold uppercase tracking-[0.3em] mt-6">
-              Official ECB Digital Terminal v1.0
+            <p className="text-center text-[7px] text-slate-700 font-bold uppercase tracking-[0.4em] mt-5">
+              Secure ECB Digital Terminal • v1.0.4
             </p>
           </div>
         </div>
