@@ -70,31 +70,33 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Global Disclaimer Bar */}
-      <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 text-[10px] py-1.5 px-4 text-center font-bold border-b border-amber-200 dark:border-amber-800 sticky top-0 z-[70]">
-        ⚠️ PROJECT ONLY: This is a simulated E-Voting system for educational purposes. Not affiliated with ECB, ECI, or any government body.
-      </div>
+      <div className="sticky top-0 z-[100] w-full">
+        {/* Global Disclaimer Bar */}
+        <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 text-[10px] py-2 px-4 text-center font-bold border-b border-amber-200 dark:border-amber-800">
+          ⚠️ PROJECT ONLY: This is a simulated E-Voting system for educational purposes. Not affiliated with ECB, ECI, or any government body.
+        </div>
 
-      {/* Tricolor top band */}
-      <div className="h-1 w-full flex z-[60] sticky top-[28px]">
-        <div className="flex-1 bg-[#FF9933]" />
-        <div className="flex-1 bg-white" />
-        <div className="flex-1 bg-[#138808]" />
-      </div>
+        {/* Tricolor top band */}
+        <div className="h-1.5 w-full flex">
+          <div className="flex-1 bg-[#FF9933]" />
+          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-[#138808]" />
+        </div>
 
-      <header className="z-50 sticky top-[32px] bg-[#1a1a2e] text-white shadow-lg">
-        <div className="mx-auto px-4 md:px-8 lg:px-12 flex justify-between items-center py-3">
-          <h1 className="font-bold text-xl tracking-tight flex items-center gap-2">
-            <Link href={"/"} className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden p-1">
-                <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[11px] md:text-sm font-black tracking-wide leading-tight truncate">Bharat Election Project</span>
-                <span className="text-[8px] md:text-[9px] font-medium text-slate-400 tracking-wider md:tracking-widest uppercase truncate">Election Commission of Bharat (ECB)</span>
-              </div>
-            </Link>
-          </h1>
+        {/* Main Header */}
+        <header className="bg-[#1a1a2e] text-white shadow-xl border-b border-white/5">
+          <div className="mx-auto px-4 md:px-8 lg:px-12 flex justify-between items-center py-4">
+            <h1 className="font-bold text-xl tracking-tight flex items-center gap-2">
+              <Link href={"/"} className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden p-1 shrink-0">
+                  <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[11px] md:text-base font-black tracking-wide leading-tight truncate uppercase">Bharat Election Project</span>
+                  <span className="text-[8px] md:text-[10px] font-medium text-slate-400 tracking-widest uppercase truncate">Election Commission of Bharat</span>
+                </div>
+              </Link>
+            </h1>
 
           {/* Navigation */}
           <nav className="hidden md:block">
