@@ -260,10 +260,12 @@ export default function VotePage() {
   const [displayLimitMLA, setDisplayLimitMLA] = useState(6);
 
   const loadData = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
     
     // Only show full-screen loader if we have no candidates yet
-    // Otherwise, refresh data silently in the background
     setIsLoading(prev => candidates.length === 0);
     try {
       // 1. Fetch Profile and check verification
@@ -379,12 +381,46 @@ export default function VotePage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [mpCandidates.length, mlaCandidates.length]);
-  if ((authLoading || isLoading) && candidates.length === 0) {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-[#FF9933]" />
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Verifying Session...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If session is loaded but no user, or still loading data
+  if (isLoading && candidates.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-[#FF9933]" />
           <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Secure Terminal Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not logged in, show a professional "Login Required" state
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+          <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Access Restricted</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
+            The Digital EVM Terminal requires a secure Aadhaar-linked session. Please sign in to proceed.
+          </p>
+          <Link href="/auth/login" className="block">
+            <Button size="lg" className="w-full h-14 bg-[#FF9933] hover:bg-[#e8851a] text-white font-black uppercase tracking-widest rounded-2xl shadow-lg">
+              Sign In to Verify
+            </Button>
+          </Link>
         </div>
       </div>
     );
