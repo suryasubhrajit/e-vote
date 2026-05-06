@@ -87,7 +87,7 @@ export default function Navbar() {
           <h1 className="font-bold text-xl tracking-tight flex items-center gap-2">
             <Link href={"/"} className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden p-1">
-                <Image src="https://iili.io/BZECcMl.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
+                <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-black tracking-wide leading-tight">Bharat Election Project</span>

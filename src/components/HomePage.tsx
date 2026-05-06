@@ -144,7 +144,7 @@ export default function HomePage() {
         <section className="grid lg:grid-cols-2 gap-12 items-center py-12 md:py-24 border-b border-slate-200 dark:border-slate-800">
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <Image src="https://iili.io/BZECcMl.png" alt="ECB Logo" width={48} height={48} className="object-contain" />
+              <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={48} height={48} className="object-contain" />
               <Badge variant="outline" className="border-[#000080] dark:border-[#FF9933] text-[#000080] dark:text-[#FF9933] px-4 py-1.5 text-xs font-black uppercase tracking-widest">
                 18th Lok Sabha General Election 2029
               </Badge>
