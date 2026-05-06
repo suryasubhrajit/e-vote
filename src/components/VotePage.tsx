@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import CandidatesList from "./CandidateList";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
-import { ShieldCheck, Info, Fingerprint, CreditCard, CheckCircle2, AlertTriangle, Vote, Loader2 } from "lucide-react";
+import { ShieldCheck, Info, Fingerprint, CreditCard, CheckCircle2, AlertTriangle, Vote, Loader2, Lock } from "lucide-react";
+import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -359,7 +360,7 @@ export default function VotePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, candidates.length]);
 
   useEffect(() => {
     loadData();

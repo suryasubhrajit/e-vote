@@ -28,7 +28,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
 import { Button } from "./ui/button";
-import { Landmark, ShieldCheck, Fingerprint } from "lucide-react";
+import { Landmark, ShieldCheck, Fingerprint, Globe, Users, Vote } from "lucide-react";
 import Meteors from "@/components/magicui/meteors";
 
 

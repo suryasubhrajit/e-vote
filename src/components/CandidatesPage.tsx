@@ -42,7 +42,7 @@ function CandidatesContent() {
       setIsLoading(false);
     };
     loadData();
-  }, []);
+  }, [candidates.length]);
 
   useEffect(() => {
     if (initialParty && parties.some(p => p.name === initialParty)) {
