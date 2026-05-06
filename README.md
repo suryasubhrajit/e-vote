@@ -1,5 +1,5 @@
-# 🗳️ Bharat E-Vote Platform
-### *Secure, Real-Time Digital Democracy & Electoral Integrity*
+# 🗳️ ECB E-Vote Platform
+### *Election Commission of Bharat (ECB) Electronic Voting Platform*
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
@@ -9,7 +9,7 @@
 ---
 
 ## 🌟 Project Overview
-The **Bharat E-Vote Platform** is a high-fidelity full-stack simulation of a modern electronic voting ecosystem. It addresses the critical challenges of **security**, **transparency**, and **accessibility** in digital voting. By integrating Aadhaar-linked verification and real-time data synchronization, it provides a "Production-Grade" experience for both voters and election observers.
+The **ECB E-Vote Platform** is a high-fidelity full-stack simulation of a modern electronic voting ecosystem. It addresses the critical challenges of **security**, **transparency**, and **accessibility** in digital voting. By integrating Aadhaar-linked verification and real-time data synchronization, it provides a "Production-Grade" experience for both voters and election observers.
 
 > **Note:** This project was developed as a sophisticated demonstration of secure full-stack architecture, focusing on electoral logic and identity verification.
 

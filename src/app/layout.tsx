@@ -10,15 +10,15 @@ import LayoutWrapper from "@/components/LayoutWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bharat Election Portal — 18th Lok Sabha General Election 2029",
-  description: "Official-grade Digital Voting Platform for Indian Parliamentary Elections. Exercise your fundamental right under Article 326. भारत निर्वाचन पोर्टल — मेरा वोट, मेरा अधिकार।",
-  keywords: ["Election Commission of Bharat", "ECB", "Digital Voting India", "Lok Sabha 2029", "Aadhaar Voting", "Online Election Portal", "Voter ID Verification", "Mera Vote Mera Adhikaar", "E-Voting India"],
+  title: "ECB E-Vote Platform — Election Commission of Bharat",
+  description: "Official Electronic Voting Platform of the Election Commission of Bharat (ECB). Secure, Aadhaar-verified digital voting for a transparent democracy.",
+  keywords: ["Election Commission of Bharat", "ECB", "E-Vote", "Digital Voting", "Electronic Voting Platform", "Aadhaar Voting", "Voter Verification"],
   authors: [{ name: "Election Commission of Bharat (Simulated)" }],
   openGraph: {
-    title: "Bharat Election Portal — Lok Sabha 2029",
-    description: "Secure, Aadhaar-verified digital voting simulation for the 18th Lok Sabha General Elections.",
-    url: "https://e-vote-india.vercel.app", // Adjust if needed
-    siteName: "ECB Digital Ballot",
+    title: "ECB E-Vote Platform — Official Voting Portal",
+    description: "Secure, Aadhaar-verified digital voting platform by the Election Commission of Bharat (ECB).",
+    url: "https://e-vote-india.vercel.app",
+    siteName: "ECB E-Vote Platform",
     images: [
       {
         url: "https://iili.io/BZEErOb.png",

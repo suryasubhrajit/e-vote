@@ -92,7 +92,7 @@ export default function Navbar() {
                   <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[11px] md:text-base font-black tracking-wide leading-tight truncate uppercase">Bharat Election Project</span>
+                  <span className="text-[11px] md:text-base font-black tracking-wide leading-tight truncate uppercase">ECB E-Vote Platform</span>
                   <span className="text-[8px] md:text-[10px] font-medium text-slate-400 tracking-widest uppercase truncate">Election Commission of Bharat</span>
                 </div>
               </Link>
@@ -273,7 +273,7 @@ export default function Navbar() {
               <div className="relative w-8 h-8 shrink-0">
                 <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" fill className="object-contain" />
               </div>
-              <span className="text-xs font-black tracking-[0.2em] uppercase text-white/90">ECB Digital Portal</span>
+              <span className="text-xs font-black tracking-[0.2em] uppercase text-white/90">ECB E-Vote Portal</span>
             </div>
             <button onClick={toggleSidebar} className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
               <AiOutlineClose className="text-lg" />
