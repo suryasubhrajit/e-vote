@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 # 🗳️ ECB E-Vote Platform
 ### *Election Commission of Bharat (ECB) Electronic Voting Platform*
+=======
+# 🗳️ E-Vote (ECB) Platform
+## Election Commission of Bharat (ECB)
+### *Secure, Real-Time Digital Democracy & Electoral Integrity*
+>>>>>>> 936ebad7fd8307a7d2ac57082a3e685735264221
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
