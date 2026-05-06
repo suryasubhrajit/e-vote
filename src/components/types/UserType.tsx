@@ -3,9 +3,10 @@ export default interface User {
   name: string;
   email: string;
   password?: string;
-  votedMP: boolean;
-  votedMLA: boolean;
-  state: string;
-  constituency: string;
+  votedMP?: boolean;
+  votedMLA?: boolean;
+  state?: string;
+  constituency?: string;
   isAdmin: boolean;
+  selectedCandidate?: string;
 }
