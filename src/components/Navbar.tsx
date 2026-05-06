@@ -262,31 +262,81 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Sidebar */}
-        <div className={`fixed inset-0 bg-[#1a1a2e] z-[100] transition-all duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"} md:hidden`}>
-          <div className="flex justify-end p-8">
-            <button onClick={toggleSidebar} className="text-white text-3xl">
-              <AiOutlineClose />
+        <div className={`fixed inset-0 bg-[#0f172a] z-[100] transition-all duration-500 ${isOpen ? "translate-x-0" : "translate-x-full"} md:hidden flex flex-col`}>
+          {/* Header Area */}
+          <div className="flex items-center justify-between p-6 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <Image src="https://iili.io/BZEErOb.png" alt="ECB Logo" width={32} height={32} className="object-contain" />
+              <span className="text-sm font-black tracking-widest uppercase">ECB Portal</span>
+            </div>
+            <button onClick={toggleSidebar} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+              <AiOutlineClose className="text-xl" />
             </button>
           </div>
-          <ul className="flex flex-col items-center gap-12 text-white mt-12">
-            <li><Link href="/" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Home</Link></li>
-            <li><Link href="/about" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/about" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>About</Link></li>
-            <li><Link href="/candidates" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/candidates" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Candidates</Link></li>
-            <li><Link href="/vote" onClick={toggleSidebar} className={`text-2xl font-bold transition-all ${pathname === "/vote" ? "text-[#FF9933] scale-110" : "text-white hover:text-[#FF9933]"}`}>Vote</Link></li>
-            <li>
-              {user ? (
-                !isVoterVerified ? (
-                  <Button onClick={handleLogout} variant="destructive" size="lg">Sign Out</Button>
+
+          <nav className="flex-1 px-6 py-12 overflow-y-auto">
+            <ul className="flex flex-col gap-4">
+              {[
+                { name: "Home", href: "/", icon: <Globe className="w-5 h-5" /> },
+                { name: "About", href: "/about", icon: <Landmark className="w-5 h-5" /> },
+                { name: "Candidates", href: "/candidates", icon: <Users className="w-5 h-5" /> },
+                { name: "Vote", href: "/vote", icon: <Vote className="w-5 h-5" /> },
+              ].map((item) => (
+                <li key={item.name}>
+                  <Link 
+                    href={item.href} 
+                    onClick={toggleSidebar} 
+                    className={`flex items-center gap-4 p-5 rounded-2xl transition-all font-black uppercase tracking-widest text-sm ${
+                      pathname === item.href 
+                      ? "bg-[#FF9933] text-white shadow-lg" 
+                      : "bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    <span className={pathname === item.href ? "text-white" : "text-[#FF9933]"}>
+                      {item.icon}
+                    </span>
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Footer Area */}
+          <div className="p-8 border-t border-white/5 bg-white/5">
+            {user ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 px-2">
+                  <div className="w-10 h-10 rounded-full bg-[#FF9933] flex items-center justify-center font-black text-white">
+                    {user.email?.[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Active Session</p>
+                    <p className="text-xs font-bold text-white truncate">{user.email}</p>
+                  </div>
+                </div>
+                {!isVoterVerified ? (
+                  <Button onClick={handleLogout} variant="destructive" className="w-full h-14 rounded-2xl font-black uppercase tracking-widest">
+                    Sign Out Terminal
+                  </Button>
                 ) : (
-                  <Button disabled variant="outline" size="lg" className="border-slate-500 text-slate-500">Sign Out Locked</Button>
+                  <Button disabled variant="outline" className="w-full h-14 rounded-2xl border-slate-700 text-slate-500 font-black uppercase tracking-widest opacity-50">
+                    Sign Out Locked
+                  </Button>
                 )
-              ) : (
-                <Link href="/auth/login" onClick={toggleSidebar}>
-                  <Button size="lg" className="bg-[#FF9933] hover:bg-[#e8851a] text-white">Sign In</Button>
-                </Link>
-              )}
-            </li>
-          </ul>
+              }
+              </div>
+            ) : (
+              <Link href="/auth/login" onClick={toggleSidebar}>
+                <Button className="w-full h-14 bg-[#FF9933] hover:bg-[#e8851a] text-white font-black uppercase tracking-widest rounded-2xl">
+                  Sign In to Verify
+                </Button>
+              </Link>
+            )}
+            <p className="text-center text-[8px] text-slate-600 font-bold uppercase tracking-[0.3em] mt-6">
+              Official ECB Digital Terminal v1.0
+            </p>
+          </div>
         </div>
       </header>
     </>
