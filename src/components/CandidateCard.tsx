@@ -72,6 +72,7 @@ interface CandidateCardProps {
     headquarters?: string;
     vision?: string;
     description?: string;
+    logo?: string;
   };
 }
 
