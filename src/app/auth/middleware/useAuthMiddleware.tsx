@@ -46,14 +46,26 @@ export const useAuthMiddleware = () => {
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('is_admin, is_voter_verified, name')
+            .select('is_admin, is_voter_verified, name, voters(full_name)')
             .eq('id', user.id)
             .single();
 
           if (error) throw error;
+          
           setIsAdmin(data?.is_admin || false);
           setIsVoterVerified(data?.is_voter_verified || false);
-          setProfileName(data?.name || null);
+          
+          // Prioritize the legal name from the voters database
+          const legalName = (data as any)?.voters?.full_name || data?.name || null;
+          setProfileName(legalName);
+
+          // Silent Repair: If verified but profile name is still the old Google name, update it
+          if (data?.is_voter_verified && (data as any)?.voters?.full_name && (data as any)?.voters?.full_name !== data.name) {
+            await supabase
+              .from('profiles')
+              .update({ name: (data as any).voters.full_name })
+              .eq('id', user.id);
+          }
         } catch (error) {
           console.error("Error fetching user data:", error);
           setIsAdmin(false);
