@@ -5,14 +5,18 @@ import { Button } from "./ui/button";
 import { ArrowRight, ShieldCheck, Globe, Lock, CheckCircle2, Timer, Fingerprint, Vote, Landmark, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useAuthMiddleware } from "@/app/auth/middleware/useAuthMiddleware";
-import { getElectionStats, getLiveResults } from "@/lib/utils";
+import { getElectionStats, getLiveResults, getParties } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
 import { Search, Filter, Trophy, TrendingUp, User as UserIcon } from "lucide-react";
-import Meteors from "@/components/magicui/meteors";
-import RetroGrid from "@/components/magicui/retro-grid";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import { memo } from "react";
 
-const CountdownTimer = () => {
+const Meteors = dynamic(() => import("@/components/magicui/meteors"), { ssr: false });
+const RetroGrid = dynamic(() => import("@/components/magicui/retro-grid"), { ssr: false });
+
+const CountdownTimer = memo(() => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
@@ -50,10 +54,10 @@ const CountdownTimer = () => {
       ))}
     </div>
   );
-};
+});
 
 // Spinning Ashoka Chakra SVG
-const AshokaChakra = ({ className = "w-12 h-12" }: { className?: string }) => (
+const AshokaChakra = memo(({ className = "w-12 h-12" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={`${className} animate-spin`} style={{ animationDuration: "20s" }}>
     <circle cx="50" cy="50" r="45" fill="none" stroke="#000080" strokeWidth="3" />
     <circle cx="50" cy="50" r="8" fill="#000080" />
@@ -69,7 +73,7 @@ const AshokaChakra = ({ className = "w-12 h-12" }: { className?: string }) => (
       />
     ))}
   </svg>
-);
+));
 
 export default function HomePage() {
   const { user } = useAuthMiddleware();
@@ -79,6 +83,7 @@ export default function HomePage() {
     voterTurnout: number;
   } | null>(null);
   const [liveResults, setLiveResults] = useState<any[]>([]);
+  const [parties, setParties] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<"ALL" | "MP" | "MLA">("ALL");
   const [stateFilter, setStateFilter] = useState("ALL");
@@ -86,12 +91,14 @@ export default function HomePage() {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const [statsData, resultsData] = await Promise.all([
+        const [statsData, resultsData, partiesData] = await Promise.all([
           getElectionStats(),
-          getLiveResults()
+          getLiveResults(),
+          getParties()
         ]);
         setStats(statsData);
         setLiveResults(resultsData.slice(0, 5)); // Show top 5
+        setParties(partiesData);
       } catch (error) {
         console.error("Failed to fetch data", error);
       }
@@ -100,7 +107,6 @@ export default function HomePage() {
     const interval = setInterval(fetchAllData, 10000); // Auto refresh every 10s
     return () => clearInterval(interval);
   }, []);
-
   const filteredResults = liveResults.filter(candidate => {
     const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          candidate.party.toLowerCase().includes(searchTerm.toLowerCase());
@@ -256,75 +262,112 @@ export default function HomePage() {
                   const voteShare = stats ? ((candidate.votes / stats.totalVotes) * 100).toFixed(1) : "0";
                   
                   return (
-                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                      {/* Top Banner */}
-                      <div className={`h-2 w-full ${candidate.type === "MP" ? "bg-[#FF9933]" : "bg-[#138808]"}`} />
+                    <div key={idx} className={`relative bg-white dark:bg-slate-900 rounded-[2.5rem] border ${idx === 0 ? 'border-[#138808] ring-1 ring-[#138808]/20 shadow-[0_20px_50px_rgba(19,136,8,0.1)]' : 'border-slate-200 dark:border-slate-800 shadow-xl'} overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}>
+                      {/* Top Accent Bar */}
+                      <div className={`h-2.5 w-full ${candidate.type === "MP" ? "bg-gradient-to-r from-[#FF9933] to-[#FFCC33]" : "bg-gradient-to-r from-[#138808] to-[#99FF99]"}`} />
                       
                       <div className="p-8">
-                        <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-start justify-between mb-8">
                           <div className="relative">
-                            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-md">
+                            <div className="w-24 h-24 rounded-xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl relative z-10">
                               {candidate.photo ? (
-                                <img src={candidate.photo} alt={candidate.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <Image 
+                                  src={candidate.photo} 
+                                  alt={candidate.name} 
+                                  width={96} 
+                                  height={96} 
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                />
                               ) : (
                                 <div className="w-full h-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
-                                  <UserIcon className="w-8 h-8 text-slate-300" />
+                                  <UserIcon className="w-10 h-10 text-slate-300" />
                                 </div>
                               )}
                             </div>
-                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white dark:bg-slate-900 rounded-lg p-1 shadow-md border border-slate-100 dark:border-slate-800">
+                            {/* Larger Party Logo Badge */}
+                            <div className="absolute -bottom-3 -right-3 w-14 h-14 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border-2 border-slate-50 dark:border-slate-800 z-20 flex items-center justify-center overflow-hidden">
                               {candidate.symbol ? (
-                                <img src={candidate.symbol} alt={candidate.party} className="w-full h-full object-contain" />
+                                <Image 
+                                  src={candidate.symbol} 
+                                  alt={candidate.party} 
+                                  width={48} 
+                                  height={48} 
+                                  className="w-full h-full object-contain" 
+                                />
                               ) : (
-                                <div className="text-[8px] font-black flex items-center justify-center h-full">IND</div>
+                                <div className="text-[10px] font-black text-slate-400">IND</div>
                               )}
                             </div>
                           </div>
+
                           <div className="text-right">
-                            <Badge variant="outline" className="mb-2 text-[8px] font-black tracking-widest border-slate-200 dark:border-slate-800 text-slate-500">
-                              {candidate.type} • {candidate.state}
-                            </Badge>
-                            <div className="flex items-center justify-end gap-2 text-3xl font-black text-slate-900 dark:text-white">
-                              {candidate.votes.toLocaleString()}
-                              <TrendingUp className="w-4 h-4 text-[#138808] animate-bounce" />
+                            <div className="mb-3">
+                              <Badge variant="outline" className="bg-slate-50 dark:bg-slate-800/50 text-[9px] font-black tracking-[0.2em] px-3 py-1 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 uppercase">
+                                {candidate.type} • {candidate.state}
+                              </Badge>
                             </div>
-                            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Validated Votes</p>
+                            <div className="flex items-baseline justify-end gap-1 mb-1">
+                              <span className="text-4xl font-black text-slate-900 dark:text-white tabular-nums tracking-tighter">
+                                {candidate.votes.toLocaleString()}
+                              </span>
+                              {idx === 0 && <TrendingUp className="w-5 h-5 text-[#138808] animate-pulse" />}
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Validated Votes</p>
                           </div>
                         </div>
 
-                        <div className="space-y-2 mb-6">
-                          <h4 className="text-xl font-black text-slate-900 dark:text-white truncate uppercase tracking-tighter">
+                        <div className="space-y-1 mb-8">
+                          <h4 className="text-2xl font-black text-slate-900 dark:text-white truncate tracking-tight">
                             {candidate.name}
                           </h4>
-                          <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-slate-300" />
-                            {candidate.party}
-                          </p>
-                          <p className="text-[10px] text-[#FF9933] font-black uppercase tracking-widest">
-                            {candidate.constituency} Constituency
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-[#138808]" />
+                            <p className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                              {candidate.party}
+                            </p>
+                          </div>
+                          <p className="text-xs font-black text-[#FF9933] uppercase tracking-widest pt-1">
+                            {candidate.constituency} <span className="opacity-50 font-medium">CONSTITUENCY</span>
                           </p>
                         </div>
 
-                        <div className="pt-6 border-t border-slate-50 dark:border-slate-800">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Vote Share</span>
-                            <span className="text-sm font-black text-[#138808]">{voteShare}%</span>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-end">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Vote Share</p>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-2xl font-black text-[#138808]">{voteShare}%</span>
+                                {idx === 0 && <span className="text-[10px] font-bold text-[#138808] bg-[#138808]/10 px-2 py-0.5 rounded-full">+2.4%</span>}
+                              </div>
+                            </div>
+                            {candidate.gender && (
+                                <Badge variant="outline" className="text-[8px] font-bold border-slate-100 dark:border-slate-800 text-slate-400 uppercase">
+                                    {candidate.gender}
+                                </Badge>
+                            )}
                           </div>
-                          <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+                          <div className="h-3 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden p-0.5 border border-slate-100 dark:border-slate-800">
                             <div 
-                              className="h-full bg-gradient-to-r from-[#FF9933] to-[#e8851a] rounded-full transition-all duration-1000 shadow-sm"
+                              className={`h-full rounded-full transition-all duration-1000 shadow-sm ${idx === 0 ? 'bg-gradient-to-r from-[#138808] to-[#28a745]' : 'bg-gradient-to-r from-[#FF9933] to-[#e8851a]'}`}
                               style={{ width: `${voteShare}%` }}
                             />
                           </div>
                         </div>
                       </div>
 
-                      {/* Result Status Overlay */}
-                      <div className={`py-3 px-8 flex items-center justify-center gap-2 ${idx === 0 ? "bg-[#138808]/10 text-[#138808]" : "bg-slate-50 dark:bg-slate-800/50 text-slate-500"}`}>
-                        {idx === 0 ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
-                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">
-                          {idx === 0 ? "LEADING IN TRENDS" : "TRAILING"}
-                        </span>
+                      {/* Professional Status Bar */}
+                      <div className={`py-4 px-8 flex items-center justify-between ${idx === 0 ? "bg-[#138808] text-white" : "bg-slate-50 dark:bg-slate-800/80 text-slate-500"}`}>
+                        <div className="flex items-center gap-2">
+                          {idx === 0 ? <Trophy className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                          <span className="text-[11px] font-black uppercase tracking-[0.2em]">
+                            {idx === 0 ? "LEADING IN TRENDS" : "TRAILING"}
+                          </span>
+                        </div>
+                        {idx === 0 && (
+                            <div className="flex gap-1">
+                                {[1,2,3].map(i => <div key={i} className="w-1 h-1 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />)}
+                            </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -399,6 +442,139 @@ export default function HomePage() {
                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed">{pillar.desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+        {/* Party Directory Section */}
+        <section className="py-24 bg-slate-50 dark:bg-slate-900/50">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+              <div className="space-y-4">
+                <Badge className="bg-[#138808] text-white px-3 py-1 text-[10px] font-black tracking-widest uppercase">
+                  Political Entities
+                </Badge>
+                <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Party Directory
+                </h2>
+                <p className="text-slate-500 dark:text-slate-400 font-medium max-w-2xl">
+                  Get to know the ideologies and symbols of the major political parties contesting in this digital electoral cycle.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {parties.length > 0 ? (
+                parties.map((party, i) => (
+                  <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-2xl transition-all duration-500 group flex flex-col h-full">
+                    <div className="w-24 h-24 mb-6 shadow-2xl rounded-2xl overflow-hidden group-hover:scale-105 transition-transform duration-500 flex items-center justify-center border-0">
+                      <Image src={party.logo} alt={party.name} width={96} height={96} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="space-y-1 mb-4">
+                      <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-none font-bold tracking-widest uppercase text-[9px]">
+                        {party.shortCode} • {party.vision}
+                      </Badge>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
+                          <MapPin className="w-3 h-3" />
+                          {party.headquarters}
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{party.name}</h3>
+                    <p className="text-[11px] font-black text-[#FF9933] uppercase tracking-widest mb-3">President: {party.president}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                      {party.description}
+                    </p>
+                    <div className="mt-auto pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center text-[10px] font-bold text-slate-400">
+                      <span>ESTD. {party.foundedYear}</span>
+                      <Link href={`/candidates?party=${party.name}`} className="text-[#138808] hover:underline flex items-center gap-1 font-black">
+                          VIEW CANDIDATES <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                [1,2,3,4].map(i => (
+                  <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-lg animate-pulse">
+                    <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-6" />
+                    <div className="w-24 h-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4" />
+                    <div className="w-full h-6 bg-slate-100 dark:bg-slate-800 rounded-full mb-3" />
+                    <div className="w-full h-12 bg-slate-100 dark:bg-slate-800 rounded-xl" />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Laws & Regulations Section */}
+        <section className="py-24 bg-white dark:bg-slate-950">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <Badge className="bg-blue-600 text-white px-3 py-1 text-[10px] font-black tracking-widest uppercase mb-4">
+                Legal Framework
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+                Election Laws & Regulations
+              </h2>
+              <div className="h-1.5 w-24 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] mx-auto rounded-full" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="space-y-8">
+                <div className="p-8 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 -mr-8 -mt-8 rounded-full" />
+                  <h4 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xs font-black">01</span>
+                    Single Candidacy
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    As per the Representation of the People Act, 1951, a political party can nominate only <strong>one candidate</strong> per constituency. Multiple nominations from the same party lead to disqualification.
+                  </p>
+                </div>
+                <div className="p-8 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 -mr-8 -mt-8 rounded-full" />
+                  <h4 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center text-xs font-black">02</span>
+                    Article 326
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    The Constitution of India grants every citizen above the age of 18 the right to vote through <strong>Universal Adult Suffrage</strong>, ensuring equal participation regardless of caste, creed, or gender.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative flex items-center justify-center py-8">
+                 <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 rounded-[3rem] -rotate-3" />
+                 <div className="relative bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-700">
+                    <Landmark className="w-20 h-20 text-[#FF9933] mx-auto mb-6" />
+                    <h3 className="text-2xl font-black text-center mb-4 tracking-tighter">Election Commission Powers</h3>
+                    <p className="text-sm text-center text-slate-500 dark:text-slate-400 font-medium">
+                      Article 324 of the Constitution vests the superintendence, direction, and control of elections in the <strong>Election Commission of India</strong>, an autonomous constitutional authority.
+                    </p>
+                 </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="p-8 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 -mr-8 -mt-8 rounded-full" />
+                  <h4 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-xs font-black">03</span>
+                    Model Code (MCC)
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    The <strong>Model Code of Conduct</strong> is a set of guidelines issued by the ECI for the conduct of political parties and candidates during elections, ensuring high standards of public morality.
+                  </p>
+                </div>
+                <div className="p-8 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 -mr-8 -mt-8 rounded-full" />
+                  <h4 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-xs font-black">04</span>
+                    Form 26 Disclosure
+                  </h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    Candidates are legally required to file <strong>Form 26</strong>, disclosing their educational background, assets, liabilities, and any past criminal record to the public.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

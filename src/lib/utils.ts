@@ -46,6 +46,7 @@ export const fetchCandidates = async () => {
     liabilities: candidate.liabilities,
     criminal_records: candidate.criminal_records,
     district: candidate.district,
+    gender: candidate.gender,
   }));
 };
 
@@ -122,7 +123,8 @@ export async function getLiveResults() {
           type,
           photo_url,
           state,
-          constituency
+          constituency,
+          gender
         )
       `);
 
@@ -142,16 +144,43 @@ export async function getLiveResults() {
           photo: v.candidates?.photo_url,
           state: v.candidates?.state,
           constituency: v.candidates?.constituency,
+          gender: v.candidates?.gender,
           votes: 0
         };
       }
       tally[id].votes++;
     });
 
-    // Convert to array and sort
     return Object.values(tally).sort((a, b) => b.votes - a.votes);
   } catch (error) {
     console.error("Error fetching live results:", error);
+    return [];
+  }
+}
+
+export async function getParties() {
+  try {
+    const { data, error } = await supabase
+      .from('parties')
+      .select('*')
+      .order('name', { ascending: true });
+    
+    if (error) throw error;
+    
+    return data.map(p => ({
+      id: p.id,
+      name: p.name,
+      shortCode: p.short_code,
+      logo: p.logo_url,
+      vision: p.vision,
+      description: p.description,
+      president: p.president,
+      foundedYear: p.founded_year,
+      headquarters: p.headquarters,
+      color: p.color_gradient
+    }));
+  } catch (error) {
+    console.error("Error fetching parties:", error);
     return [];
   }
 }

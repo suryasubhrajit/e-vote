@@ -1,32 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { fetchCandidates } from "@/lib/utils";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { fetchCandidates, getParties } from "@/lib/utils";
 import CandidateCard from "./CandidateCard";
 import { Input } from "./ui/input";
 import { Search, Users, Landmark, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "./ui/badge";
+import { Loader2 } from "lucide-react";
 
-export default function CandidatesPage() {
+function CandidatesContent() {
+  const searchParams = useSearchParams();
+  const initialParty = searchParams.get("party");
+  
   const [candidates, setCandidates] = useState<any[]>([]);
+  const [parties, setParties] = useState<any[]>([]);
   const [filteredCandidates, setFilteredCandidates] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [stateFilter, setStateFilter] = useState("all");
+  const [partyFilter, setPartyFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [displayLimit, setDisplayLimit] = useState(6);
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchCandidates();
-      // Filter out NOTA from the public directory - NOTA is only for the voting terminal
-      const realCandidates = data.filter(c => c.name !== "Candidate NOTA" && c.partyName !== "NOTA");
+      const [candData, partyData] = await Promise.all([
+        fetchCandidates(),
+        getParties()
+      ]);
+      
+      // Filter out NOTA from the public directory
+      const realCandidates = candData.filter(c => c.name !== "Candidate NOTA" && c.partyName !== "NOTA");
       setCandidates(realCandidates);
       setFilteredCandidates(realCandidates);
+      setParties(partyData);
       setIsLoading(false);
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (initialParty && parties.some(p => p.name === initialParty)) {
+      setPartyFilter(initialParty);
+    }
+  }, [initialParty, parties]);
 
   useEffect(() => {
     let result = candidates;
@@ -43,14 +62,35 @@ export default function CandidatesPage() {
       result = result.filter(c => c.state === stateFilter);
     }
 
+    if (partyFilter !== "all") {
+      result = result.filter(c => c.partyName === partyFilter);
+    }
+
     if (typeFilter !== "all") {
       result = result.filter(c => c.type === typeFilter);
     }
 
     setFilteredCandidates(result);
-  }, [searchQuery, stateFilter, typeFilter, candidates]);
+    setDisplayLimit(6); // Reset on filter change
+  }, [searchQuery, stateFilter, partyFilter, typeFilter, candidates]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 500
+      ) {
+        setDisplayLimit((prev) => Math.min(prev + 6, filteredCandidates.length));
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [filteredCandidates.length]);
+
+  const displayedCandidates = filteredCandidates.slice(0, displayLimit);
 
   const uniqueStates = Array.from(new Set(candidates.map(c => c.state))).filter(Boolean);
+  const uniqueParties = Array.from(new Set(candidates.map(c => c.partyName))).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-24">
@@ -79,8 +119,8 @@ export default function CandidatesPage() {
 
         {/* Filters Section */}
         <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-            <div className="md:col-span-2 space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <div className="md:col-span-4 space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search Candidates</label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -93,7 +133,7 @@ export default function CandidatesPage() {
               </div>
             </div>
             
-            <div className="space-y-2">
+            <div className="md:col-span-3 space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filter by State</label>
               <Select onValueChange={setStateFilter} defaultValue="all">
                 <SelectTrigger className="h-14 rounded-2xl border-slate-200 bg-slate-50/50">
@@ -108,8 +148,23 @@ export default function CandidatesPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Candidate Type</label>
+            <div className="md:col-span-3 space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Political Party</label>
+              <Select onValueChange={setPartyFilter} defaultValue="all">
+                <SelectTrigger className="h-14 rounded-2xl border-slate-200 bg-slate-50/50">
+                  <SelectValue placeholder="All Parties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Parties</SelectItem>
+                  {uniqueParties.map(party => (
+                    <SelectItem key={party} value={party}>{party}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type</label>
               <Select onValueChange={setTypeFilter} defaultValue="all">
                 <SelectTrigger className="h-14 rounded-2xl border-slate-200 bg-slate-50/50">
                   <SelectValue placeholder="All Types" />
@@ -133,10 +188,11 @@ export default function CandidatesPage() {
           </div>
         ) : filteredCandidates.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCandidates.map(candidate => (
+            {displayedCandidates.map(candidate => (
               <CandidateCard 
                 key={candidate.id} 
                 {...candidate} 
+                partyDetails={parties.find(p => p.name === candidate.partyName)}
                 votingOption={false} 
               />
             ))}
@@ -149,6 +205,15 @@ export default function CandidatesPage() {
           </div>
         )}
 
+        {displayLimit < filteredCandidates.length && (
+          <div className="mt-12 flex justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-8 h-8 animate-spin text-[#FF9933]" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading More Candidates...</p>
+            </div>
+          </div>
+        )}
+
         {/* ECB Project Footer */}
         <div className="mt-20 pt-8 border-t border-slate-200 dark:border-slate-800 text-center">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em]">
@@ -157,5 +222,17 @@ export default function CandidatesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CandidatesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <Loader2 className="w-12 h-12 text-[#FF9933] animate-spin" />
+      </div>
+    }>
+      <CandidatesContent />
+    </Suspense>
   );
 }

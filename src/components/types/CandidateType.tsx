@@ -16,4 +16,5 @@ export default interface Candidate {
   liabilities: string;
   criminal_records: string;
   district: string;
+  gender: string;
 }

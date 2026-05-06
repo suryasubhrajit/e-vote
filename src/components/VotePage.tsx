@@ -255,6 +255,8 @@ export default function VotePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [votedMP, setVotedMP] = useState(false);
   const [votedMLA, setVotedMLA] = useState(false);
+  const [displayLimitMP, setDisplayLimitMP] = useState(6);
+  const [displayLimitMLA, setDisplayLimitMLA] = useState(6);
 
   const loadData = useCallback(async () => {
     if (!user) return;
@@ -336,7 +338,8 @@ export default function VotePage() {
               assets: c.assets,
               liabilities: c.liabilities,
               criminal_records: c.criminal_records,
-              district: c.district
+              district: c.district,
+              gender: c.gender
             })));
           }
         } else {
@@ -355,6 +358,20 @@ export default function VotePage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 500
+      ) {
+        setDisplayLimitMP((prev) => Math.min(prev + 6, mpCandidates.length));
+        setDisplayLimitMLA((prev) => Math.min(prev + 6, mlaCandidates.length));
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [mpCandidates.length, mlaCandidates.length]);
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -376,6 +393,9 @@ export default function VotePage() {
 
   const mpCandidates = candidates.filter(c => c.type === 'MP' && c.constituency === verifiedVoter?.constituency_mp);
   const mlaCandidates = candidates.filter(c => c.type === 'MLA' && c.constituency === verifiedVoter?.constituency_mla);
+
+  const displayedMP = mpCandidates.slice(0, displayLimitMP);
+  const displayedMLA = mlaCandidates.slice(0, displayLimitMLA);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-24">
@@ -451,8 +471,8 @@ export default function VotePage() {
               {[1, 2, 3].map(i => <div key={i} className="h-96 bg-slate-100 dark:bg-slate-900 animate-pulse rounded-2xl" />)}
             </div>
           ) : mpCandidates.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {mpCandidates.map(candidate => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {displayedMP.map(candidate => (
                 <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMP} voted={votedMP} onVoteSuccess={loadData} />
               ))}
             </div>
@@ -483,8 +503,8 @@ export default function VotePage() {
               {[1, 2, 3].map(i => <div key={i} className="h-96 bg-slate-100 dark:bg-slate-900 animate-pulse rounded-2xl" />)}
             </div>
           ) : mlaCandidates.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {mlaCandidates.map(candidate => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {displayedMLA.map(candidate => (
                 <CandidateCard key={candidate.id} {...candidate} votingOption={!votedMLA} voted={votedMLA} onVoteSuccess={loadData} />
               ))}
             </div>
