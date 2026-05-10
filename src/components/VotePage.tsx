@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
-import { fetchCandidates, validateAadhaar } from "@/lib/utils";
+import { fetchCandidates, validateAadhaar, validateVoterId } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import Candidate from "./types/CandidateType";
 import CandidateCard from "./CandidateCard";
@@ -36,8 +36,8 @@ const VerificationGate = ({ onVerified, user }: { onVerified: (voter: any) => vo
       toast.error("Please enter a valid 12-digit Aadhaar number");
       return;
     }
-    if (!voterId || voterId.length < 10) {
-      toast.error("Please enter a valid Voter ID (EPIC Number)");
+    if (!validateVoterId(voterId)) {
+      toast.error("Please enter a valid Voter ID (EPIC Number) — format: 3 letters + 7 digits, e.g. ABC1234567");
       return;
     }
 

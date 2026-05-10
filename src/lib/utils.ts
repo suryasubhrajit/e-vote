@@ -18,6 +18,16 @@ export const validateAadhaar = (aadhaar: string) => {
   return regex.test(aadhaar);
 };
 
+/**
+ * Validates a Voter ID (EPIC Number) in the standard format:
+ * 3 uppercase letters (regional/series prefix) + 7 digits (unique sequence)
+ * Example: ABC1234567
+ */
+export const validateVoterId = (voterId: string) => {
+  const regex = /^[A-Z]{3}[0-9]{7}$/;
+  return regex.test(voterId.trim().toUpperCase());
+};
+
 export const fetchCandidates = async () => {
   const { data, error } = await supabase
     .from('candidates')
